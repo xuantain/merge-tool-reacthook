@@ -5,18 +5,41 @@
   "license": "MIT",
   "repository": "local",
   "scripts": {
-    "start": "node app.js",
+    "start": "NODE_PATH=./config:./lib:./api/controllers NODE_ENV=development node app.js",
+    "startd": "NODE_PATH=./config:./lib:./api/controllers NODE_ENV=development ./node_modules/.bin/nodemon app.js",
     "build": "gulp build",
     "minify": "gulp minify"
   },
   "dependencies": {
+    "bluebird": "^3.0.5",
+    "body-parser": "~1.13.2",
+    "compression": "^1.6.0",
+    "connect-flash": "~0.1.1",
+    "connect-mongo": "^0.8.2",
     "consolidate": "^0.13.1",
-    "express": "^3.x",
+    "cookie-parser": "~1.3.5",
+    "cookie-session": "^1.2.0",
+    "crypto-js": "^3.1.5",
+    "express": "^4.13.3",
+    "express-session": "^1.12.1",
+    "imager": "^0.4.0",
+    "lodash": "^3.10.1",
+    "method-override": "^2.3.5",
+    "moment": "~2.10.6",
+    "mongoose": "^4.2.5",
+    "morgan": "^1.6.1",
+    "multer": "^1.1.0",
+    "passport": "^0.3.2",
+    "passport-local": "^1.0.0",
+    "serve-favicon": "~2.3.0",
+    "superagent": "^1.5.0",
     "swagger-noodle": "^0.1.0",
-    "swig": "^1.4.2"
+    "swig": "^1.4.2",
+    "winston": "^2.1.0"
   },
   "devDependencies": {
-    "bower": "^1.6.5",
+    "bower": "~1.6.5",
+    "flux": "^2.1.1",
     "gulp": "^3.9.0",
     "gulp-browserify": "^0.5.1",
     "gulp-clean": "^0.3.1",
@@ -26,7 +49,8 @@
     "gulp-rename": "^1.2.2",
     "gulp-sourcemaps": "^1.6.0",
     "gulp-uglify": "^1.4.2",
-    "react": "^0.13.3"
+    "react": "^0.13.3",
+    "reactify": "^1.1.0"
   },
   "engines": {
     "node": ">=0.12.7"

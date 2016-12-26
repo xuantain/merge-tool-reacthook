@@ -7,20 +7,112 @@
   },
   "produces": ["application/json"],
   "host": "localhost:3000",
-  "basePath": "/v1",
+  "basePath": "/docs",
   "paths": {
+    "/product": {
+      "get": {
+        "summary": "Get product info",
+        "description":"Get product info by id",
+        "x-swagger-router-controller": "Product",
+        "tags": ["Product"],
+        "operationId": "productGet",
+        "parameters": [
+          {
+            "name" : "id",
+            "in" : "query",
+            "description" : "The id of product",
+            "required" : true,
+            "type" : "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description" : "Found A product",
+            "schema" : {
+              "$ref" : "#/definitions/Product"
+            }
+          },
+          "204": {
+            "description" : "Did not find a product"
+          },
+          "default": {
+            "description" : "Unexpected error",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update product info",
+        "description":"Update product info",
+        "x-swagger-router-controller": "Product",
+        "tags": ["Product"],
+        "operationId": "productPut",
+        "parameters": [
+          {
+            "name" : "product object",
+            "in" : "query",
+            "description" : "A product object json",
+            "required" : true,
+            "type" : "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description" : "Update a product",
+            "schema" : {
+              "$ref" : "#/definitions/Product"
+            }
+          },
+          "default": {
+            "description" : "Unexpected error",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a product",
+        "description":"Delete a product",
+        "x-swagger-router-controller": "Product",
+        "tags": ["Product"],
+        "operationId": "productDelete",
+        "parameters": [
+          {
+            "name" : "id",
+            "in" : "query",
+            "description" : "The id of product",
+            "required" : true,
+            "type" : "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description" : "Delete a product successful"
+          },
+          "default": {
+            "description" : "Unexpected error",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
     "/products": {
       "get": {
-        "summary": "Product Types",
-        "description":"The Products endpoint returns information about the *Uber* products\noffered at a given location. The response includes the display name\nand other details about each product, and lists the products in the\nproper display order.\n",
+        "summary": "Get products by category's _id",
+        "description":"Returns all products in category",
         "x-swagger-router-controller": "Products",
         "tags": ["Products"],
         "operationId": "productsGet",
         "parameters": [
           {
-            "name" : "p_name",
+            "name" : "id",
             "in" : "query",
-            "description" : "The name of product",
+            "description" : "The id of category",
             "required" : true,
             "type" : "string"
           }
@@ -44,12 +136,101 @@
         }
       }
     },
+    "/category": {
+      "get": {
+        "summary": "Get category by id",
+        "description":"Get category by id",
+        "x-swagger-router-controller": "Category",
+        "tags": ["Category"],
+        "operationId": "categoryGet",
+        "parameters": [
+          {
+            "name" : "id",
+            "in" : "query",
+            "description" : "The id of category",
+            "required" : true,
+            "type" : "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description" : "An object category",
+            "schema" : {
+              "$ref" : "#/definitions/Category"
+            }
+          },
+          "default": {
+            "description" : "Unexpected error",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a category",
+        "description":"Update a category",
+        "x-swagger-router-controller": "Category",
+        "tags": ["Category"],
+        "operationId": "categoryPut",
+        "parameters": [
+          {
+            "name" : "Object category",
+            "in" : "query",
+            "description" : "A category object json",
+            "required" : true,
+            "type" : "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description" : "An object category with new _rev",
+            "schema" : {
+              "$ref" : "#/definitions/Category"
+            }
+          },
+          "default": {
+            "description" : "Unexpected error",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a category",
+        "description":"Delete a category",
+        "x-swagger-router-controller": "Category",
+        "tags": ["Category"],
+        "operationId": "categoryDelete",
+        "parameters": [
+          {
+            "name" : "id",
+            "in" : "query",
+            "description" : "The id of category",
+            "required" : true,
+            "type" : "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description" : "Delete a category successful"
+          },
+          "default": {
+            "description" : "Unexpected error",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
     "/history": {
       "get": {
         "summary": "User Activity",
         "description":"The User Activity endpoint returns data about a user&#39;s lifetime activity with Uber. The response will include pickup locations and times, dropoff locations and times, the distance of past requests, and information about which products were requested.&lt;br&gt;&lt;br&gt;The history array in the response will have a maximum length based on the limit parameter. The response value count may exceed limit, therefore subsequent API requests may be necessary.",
         "x-swagger-router-controller": "User",
-        "tags": ["User"],
+        "tags": ["History"],
         "operationId": "historyGet",
         "parameters": [
           {
@@ -85,13 +266,22 @@
         }
       }
     },
-    "/me": {
+    "/user": {
       "get": {
-        "summary": "User Profile",
+        "summary": "User's Profile",
         "description":"The User Profile endpoint returns information about the Uber user that has authorized with the application.",
         "x-swagger-router-controller": "User",
         "tags": ["User"],
-        "operationId": "meGet",
+        "operationId": "load",
+        "parameters": [
+          {
+            "name" : "id",
+            "in" : "query",
+            "description" : "The id of the user",
+            "required" : true,
+            "type" : "string"
+          }
+        ],
         "responses": {
           "200": {
             "description" : "Profile information for a user",
@@ -231,15 +421,19 @@
   "definitions": {
     "Product": {
       "properties" : {
-        "product_id" : {
+        "_id" : {
           "type" : "string",
-          "description" : "Unique identifier representing a specific product for a given latitude & longitude. For example, uberX in San Francisco will have a different product_id than uberX in Los Angeles."
+          "description" : "Unique identifier representing a specific product for a given UUID."
+        },
+        "_rev" : {
+          "type" : "string",
+          "description" : "Revision of Product document."
         },
         "description" : {
           "type" : "string",
           "description" : "Description of product."
         },
-        "display_name" : {
+        "name" : {
           "type" : "string",
           "description" : "Display name of product."
         },
@@ -256,6 +450,26 @@
         "image" : {
           "type" : "string",
           "description" : "Image URL representing the product."
+        }
+      }
+    },
+    "Category": {
+      "properties" : {
+        "_id" : {
+          "type" : "string",
+          "description" : "Unique identifier representing a specific Category for a given UUID."
+        },
+        "_rev" : {
+          "type" : "string",
+          "description" : "Revision of Category document."
+        },
+        "description" : {
+          "type" : "string",
+          "description" : "Description of Category."
+        },
+        "name" : {
+          "type" : "string",
+          "description" : "Display name of Category."
         }
       }
     },
@@ -293,25 +507,33 @@
     },
     "Profile": {
       "properties" : {
-        "first_name" : {
+        "name" : {
           "type" : "string",
-          "description" : "First name of the Uber user."
-        },
-        "last_name" : {
-          "type" : "string",
-          "description" : "Last name of the Uber user."
+          "description" : "Name of the Uber user."
         },
         "email" : {
           "type" : "string",
           "description" : "Email address of the Uber user"
         },
-        "picture" : {
+        "username" : {
           "type" : "string",
-          "description" : "Image URL of the Uber user."
+          "description" : "Name of the Uber user."
         },
-        "promo_code" : {
+        "provider" : {
           "type" : "string",
-          "description" : "Promo code of the Uber user."
+          "description" : "Provider of the Uber user."
+        },
+        "hashed_password" : {
+          "type" : "string",
+          "description" : "hashed_password code of the Uber user."
+        },
+        "salt" : {
+          "type" : "string",
+          "description" : "salt code of the Uber user."
+        },
+        "authToken" : {
+          "type" : "string",
+          "description" : "authToken code of the Uber user."
         }
       }
     },

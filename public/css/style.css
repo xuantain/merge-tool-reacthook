@@ -1,9 +1,9 @@
 body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+	padding: 50px;
+	font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 a {
-  color: #00B7FF;
+	color: #00B7FF;
 }
 .w20 {
 	width: 20%;
@@ -19,6 +19,9 @@ div.mgb5px {
 	padding-left: 15px;
 	height: 36px;
 	line-height: 36px;
+}
+.center {
+	margin: 10px auto;
 }
 #loginform {
 	margin: 0 auto;

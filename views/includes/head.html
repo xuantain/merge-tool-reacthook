@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <title>{{ title }} | {{ pkg.name }}</title>
+    <meta name="keywords" content="{{ pkg.keywords.join(',') }}">
+    <meta name="description" content="{{ pkg.description }}">
+
+    {# Opengraph tags #}
+    <!-- <meta property="fb:app_id" content="293989217296609">
+    <meta property="og:title" content=pkg.name + ' - ' + title>
+    <meta property="og:description" content=pkg.description>
+    <meta property="og:url" content="http://nodejs-express-demo.herokuapp.com">
+    <meta property="og:site_name" content="Node.js Express Mongoose Demo">
+    <meta property="fb:admins" content="1037213945"> -->
+
+    {% block head %}
+      {# Styles #}
+      <!-- Bootstrap Core CSS -->
+      <link href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+      <!-- <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+      <link href="//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+      <!-- <link href="bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    {% endblock %}
+  </head>
+
+  {# HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries #}
+  <!--[if lt IE 9]>
+    <script src='https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js'></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+  <![endif]-->

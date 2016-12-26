@@ -4,7 +4,7 @@ var gulp = require('gulp'), // define task builder
     react = require('gulp-react'), // compile React from JSX
     browserify = require('gulp-browserify'), // require lib/module for client-side
     clean = require('gulp-clean'), // clean old-sourcecode
-    appInfo = require('./package.json'), // load app info from package.json
+    pkg = require('./package.json'), // load app info from package.json
     concat = require('gulp-concat'), // join multiple file to vendor.js (one file)
     sourcemaps = require('gulp-sourcemaps'),
     minifyJs = require('gulp-uglify'),
@@ -14,11 +14,11 @@ var gulp = require('gulp'), // define task builder
 var rootDir = 'public';
 var srcDir = rootDir + '/src';
 var buildDir = rootDir + '/build';
-// var buildDir = rootDir + '/build/' + appInfo.version;
+// var buildDir = rootDir + '/build/' + pkg.version;
 
 // clean all old-sourcecode JS
 gulp.task('clean', function() {
-  return gulp.src( [buildDir + '/js/**/*.js', buildDir + '/css'], {read: false} )
+  return gulp.src( [buildDir + '/**/**/*.js', buildDir + '/css'], {read: false} )
     .pipe( clean() );
 });
 
@@ -29,8 +29,13 @@ gulp.task('jsx', ['clean'], function() {
     .pipe( gulp.dest(buildDir + '/js') );
 });
 
+gulp.task('copy', ['jsx','clean'], function(){
+  return gulp.src( srcDir + '/jsx/**/*.js' )
+    .pipe( gulp.dest(buildDir + '/js') );
+});
+
 // browserify to help client-side require/load all lib/module
-gulp.task('browserify', ['jsx'], function() {
+gulp.task('browserify', ['jsx','copy'], function() {
   return gulp.src( [buildDir + '/js/app.js', buildDir + '/js/admin.js'] )
     .pipe( browserify() )
     .pipe( gulp.dest(buildDir) );
@@ -68,7 +73,7 @@ gulp.task('compress-css', function() {
     .pipe( gulp.dest(buildDir + '/css/vendor.min.css') );
 });
 
-gulp.task('watch', function() {
+gulp.task('watch', ['build'], function() {
   gulp.watch(srcDir + '/jsx/**/*.jsx', ['build']);
 });
 

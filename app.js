@@ -1,48 +1,45 @@
 'use strict';
 
-var express = require('express'),
-    app = express(),
-    http = require('http'),
-    path = require('path'),
-    cons = require('consolidate'),
-    info = require('./package.json');
+var join = require('path').join,
+    express = require('express'),
+    mongoose = require('mongoose'),
+    passport = require('passport'),
+    promise = require('bluebird'),
+    mongoose = promise.promisifyAll(mongoose),
+    config = require('config');
 
-// setup template engine
-app.engine('html', cons.swig);
-app.set('view engine', 'html');
+var app = express();
+var port = process.env.PORT || 3000;
 
-// setup views folder
-app.set('views', path.join(__dirname, 'views'));
+// setup connect to mongodb
+var connect = function() {
+  var options = { server: { socketOptions: { keepAlive: 1 } } };
+  mongoose.connect(config.db.mongodb, options, function() {
+    console.log('connect to mongodb successfully');
+  });
+};
+connect();
 
-// setup public client-side folder
-// app.use(express.static(path.join(__dirname, 'build', info.version)));
-app.use(express.static(path.join(__dirname, 'public')));
+mongoose.connection.on('error', console.log);
+mongoose.connection.on('disconnected', connect);
 
-// setup swagger
-var swagger = require('swagger-noodle')({
-  API_SPEC_FILE: path.join(__dirname, 'api/swagger.json'),
-  CONTROLLERS_DIR: path.join(__dirname, 'api/controllers'),
-  MOCK_MODE: true
-});
-app.use(swagger);
+// Bootstrap passport config
+require('./config/passport')(passport);
 
-// apply using express.router
-app.use(app.router);
+// Bootstrap application settings
+require('./config/express')(app, passport);
 
-app.get('/', function(req, res) {
-  res.render('index', {title: 'hello'});
-});
+// Bootstrap swagger config
+require('./config/swagger')(app);
 
-app.get('/admin', function(req, res) {
-  res.render('admin', {title: 'admin'});
-});
-
-app.get('*', function(req, res) {
-  res.send('Page not found!', 404);
-});
+// app.use('/', app.router);
+// Bootstrap routes
+require('./config/routes')(app, passport);
 
 // setup Server
-http.createServer(app).listen(3000, function() {
-  console.log('Server started at http://localhost:%d', 3000);
-  console.log('Swagger-ui is available on http://localhost:%d/docs', 3000);
+app.listen(port, function() {
+  console.log('Server started at http://localhost:%d', port);
+  console.log('Swagger-ui is available on http://localhost:%d/docs', port);
 });
+
+module.exports = app;

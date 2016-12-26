@@ -15,6 +15,10 @@ Step 4: `$ npm install -g gulp`
 Step 5: `$ bower install`
 
 # Usage
+For creating example data, please run command below:
+
+`$ mongorestore dump`
+
 For building project, please run command below:
 
 `$ npm build`
