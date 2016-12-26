@@ -18,7 +18,7 @@
         "operationId": "productGet",
         "parameters": [
           {
-            "name" : "_id",
+            "name" : "id",
             "in" : "query",
             "description" : "The id of product",
             "required" : true,
@@ -81,7 +81,7 @@
         "operationId": "productDelete",
         "parameters": [
           {
-            "name" : "_id",
+            "name" : "id",
             "in" : "query",
             "description" : "The id of product",
             "required" : true,
@@ -110,7 +110,7 @@
         "operationId": "productsGet",
         "parameters": [
           {
-            "name" : "_id",
+            "name" : "id",
             "in" : "query",
             "description" : "The id of category",
             "required" : true,
@@ -126,6 +126,95 @@
                 "$ref" : "#/definitions/Product"
               }
             }
+          },
+          "default": {
+            "description" : "Unexpected error",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/category": {
+      "get": {
+        "summary": "Get category by id",
+        "description":"Get category by id",
+        "x-swagger-router-controller": "Category",
+        "tags": ["Category"],
+        "operationId": "categoryGet",
+        "parameters": [
+          {
+            "name" : "id",
+            "in" : "query",
+            "description" : "The id of category",
+            "required" : true,
+            "type" : "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description" : "An object category",
+            "schema" : {
+              "$ref" : "#/definitions/Category"
+            }
+          },
+          "default": {
+            "description" : "Unexpected error",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a category",
+        "description":"Update a category",
+        "x-swagger-router-controller": "Category",
+        "tags": ["Category"],
+        "operationId": "categoryPut",
+        "parameters": [
+          {
+            "name" : "Object category",
+            "in" : "query",
+            "description" : "A category object json",
+            "required" : true,
+            "type" : "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description" : "An object category with new _rev",
+            "schema" : {
+              "$ref" : "#/definitions/Category"
+            }
+          },
+          "default": {
+            "description" : "Unexpected error",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a category",
+        "description":"Delete a category",
+        "x-swagger-router-controller": "Category",
+        "tags": ["Category"],
+        "operationId": "categoryDelete",
+        "parameters": [
+          {
+            "name" : "id",
+            "in" : "query",
+            "description" : "The id of category",
+            "required" : true,
+            "type" : "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description" : "Delete a category successful"
           },
           "default": {
             "description" : "Unexpected error",
@@ -186,7 +275,7 @@
         "operationId": "load",
         "parameters": [
           {
-            "name" : "_id",
+            "name" : "id",
             "in" : "query",
             "description" : "The id of the user",
             "required" : true,
@@ -361,6 +450,26 @@
         "image" : {
           "type" : "string",
           "description" : "Image URL representing the product."
+        }
+      }
+    },
+    "Category": {
+      "properties" : {
+        "_id" : {
+          "type" : "string",
+          "description" : "Unique identifier representing a specific Category for a given UUID."
+        },
+        "_rev" : {
+          "type" : "string",
+          "description" : "Revision of Category document."
+        },
+        "description" : {
+          "type" : "string",
+          "description" : "Description of Category."
+        },
+        "name" : {
+          "type" : "string",
+          "description" : "Display name of Category."
         }
       }
     },
