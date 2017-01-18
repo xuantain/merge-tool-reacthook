@@ -2,6 +2,7 @@
 
 var React = require('react');
 var PanelOverview = require('./../../components/common/PanelOverview');
+var DataTable = require('./../../components/common/DataTable');
 
 module.exports = React.createClass({
   render: function() {
@@ -49,6 +50,11 @@ module.exports = React.createClass({
           dataPanelOverview.map(function(pandelData, index) {
             return <PanelOverview key={'pandelOverview-'+ index} data={pandelData} />
           })
+        }
+        </div>
+        <div className="row">
+        {
+          <DataTable/>
         }
         </div>
       </div>
