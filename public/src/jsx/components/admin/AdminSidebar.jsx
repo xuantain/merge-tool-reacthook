@@ -1,7 +1,7 @@
 'use strict';
 
-var React = require('react'),
-    MenuItem = require('./../components/AdminSidebarMenuItem');
+var React = require('react');
+var MenuItem = require('./../../components/admin/AdminSidebarMenuItem');
 
 var AdminSidebar = React.createClass({
   componentDidMount: function() {

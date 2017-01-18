@@ -1,8 +1,8 @@
 'use strict';
 
-var React = require('react'),
-    InputElm = require('./../components/InputElement'),
-    DropDownList = require('./../components/DropDownList');
+var React = require('react');
+var InputElm = require('./../../components/common/InputElement');
+var DropDownList = require('./../../components/common/DropDownList');
 
 module.exports = React.createClass({
   getInitialState: function() {

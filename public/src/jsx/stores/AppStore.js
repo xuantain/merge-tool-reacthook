@@ -1,14 +1,15 @@
 'use strict';
 
-var AppConstants = require('./../constants/AppConstants'),
-    AppDispatcher = require('./../dispatcher/AppDispatcher'),
-    EventEmitter = require('events').EventEmitter,
-    _ = require('lodash'),
+var AppConstants = require('./../constants/AppConstants');
+var AppDispatcher = require('./../dispatcher/AppDispatcher');
+var EventEmitter = require('events').EventEmitter;
+var _ = require('lodash');
 
-    OrderForm = require('./../forms/OrderForm'),
-    OrderOutForm = require('./../forms/OrderExportForm'),
-    LoginForm = require('./../forms/LoginForm'),
-    ProductForm = require('./../forms/ProductForm');
+// components
+var OrderForm = require('./../components/forms/OrderForm');
+var OrderOutForm = require('./../components/forms/OrderExportForm');
+var LoginForm = require('./../components/forms/LoginForm');
+var ProductForm = require('./../components/forms/ProductForm');
 
 var CHANGE_EVENT = 'change';
 

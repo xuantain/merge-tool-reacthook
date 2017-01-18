@@ -1,7 +1,7 @@
 'use strict';
 
-var AppConstants = require('./../constants/AppConstants'),
-    AppDispatcher = require('./../dispatcher/AppDispatcher');
+var AppConstants = require('./../constants/AppConstants');
+var AppDispatcher = require('./../dispatcher/AppDispatcher');
 
 var AppActions = {
 

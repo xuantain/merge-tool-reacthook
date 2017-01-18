@@ -1,23 +1,22 @@
 'use strict';
 
-var join = require('path').join,
-    express = require('express'),
-    session = require('express-session'),
-    compression = require('compression'),
-    morgan = require('morgan'),
-    cookieParser = require('cookie-parser'),
-    cookieSession = require('cookie-session'),
-    bodyParser = require('body-parser'),
-    methodOverride = require('method-override'),
-    // multer = require('multer'),
-    // favicon = require('serve-favicon'),
-
-    mongoStore = require('connect-mongo')(session),
-    flash = require('connect-flash'),
-    winston = require('winston'),
-    cons = require('consolidate'),
-    pkg = require('../package.json'),
-    config = require('config');
+var join = require('path').join;
+var express = require('express');
+var session = require('express-session');
+var compression = require('compression');
+var morgan = require('morgan');
+var cookieParser = require('cookie-parser');
+var cookieSession = require('cookie-session');
+var bodyParser = require('body-parser');
+var methodOverride = require('method-override');
+// var multer = require('multer');
+// var favicon = require('serve-favicon');
+var mongoStore = require('connect-mongo')(session);
+var flash = require('connect-flash');
+var winston = require('winston');
+var cons = require('consolidate');
+var pkg = require('../package.json');
+var config = require('config');
 
 var env = process.env.NODE_ENV || 'development';
 

@@ -1,9 +1,9 @@
 'use strict';
 
-var AppConstants = require('./../constants/AppConstants'),
-    AppDispatcher = require('./../dispatcher/AppDispatcher'),
-    ProductAPI = require('./../utils/ProductAPI'),
-    OrderAPI = require('./../utils/OrderAPI');
+var AppConstants = require('./../constants/AppConstants');
+var AppDispatcher = require('./../dispatcher/AppDispatcher');
+var ProductAPI = require('./../utils/ProductAPI');
+var OrderAPI = require('./../utils/OrderAPI');
 
 var Promise = require('bluebird');
 

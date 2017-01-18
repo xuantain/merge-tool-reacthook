@@ -1,8 +1,8 @@
 'use strict';
 
-var mongoose = require('mongoose'),
-    Schema = mongoose.Schema,
-    crypto = require('crypto');
+var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
+var crypto = require('crypto');
 
 var oAuthTypes = [
   'github',

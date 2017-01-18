@@ -1,12 +1,12 @@
 'use strict';
 
-var mongoose = require('mongoose'),
-    Schema = mongoose.Schema,
-    ObjectId = Schema.Types.ObjectId,
-    Imager = require('imager'),
-    config = require('config'),
-    fs = require('fs'),
-    imagerConfig = require(config.root + '/config/imager.js');
+var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
+var ObjectId = Schema.Types.ObjectId;
+var Imager = require('imager');
+var config = require('config');
+var fs = require('fs');
+var imagerConfig = require(config.root + '/config/imager.js');
 
 /**
  * Product Schema

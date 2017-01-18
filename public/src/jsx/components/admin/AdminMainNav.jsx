@@ -1,7 +1,7 @@
 'use strict';
 
-var React = require('react'),
-    NavItem = require('./../components/AdminMainNavItem');
+var React = require('react');
+var NavItem = require('./../../components/admin/AdminMainNavItem');
 
 module.exports = React.createClass({
   render: function() {

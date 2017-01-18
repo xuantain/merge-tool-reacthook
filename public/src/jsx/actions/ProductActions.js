@@ -1,8 +1,8 @@
 'use strict';
 
-var AppConstants = require('./../constants/AppConstants'),
-    AppDispatcher = require('./../dispatcher/AppDispatcher'),
-    ProductAPI = require('./../utils/ProductAPI');
+var AppConstants = require('./../constants/AppConstants');
+var AppDispatcher = require('./../dispatcher/AppDispatcher');
+var ProductAPI = require('./../utils/ProductAPI');
 
 var ProductActions = {
 

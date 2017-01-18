@@ -1,11 +1,11 @@
 'use strict';
 
-var join = require('path').join,
-    extend = require('util')._extend;
+var join = require('path').join;
+var extend = require('util')._extend;
 
-var development = require('./env/development'),
-    production = require('./env/production'),
-    test = require('./env/test');
+var development = require('./env/development');
+var production = require('./env/production');
+var test = require('./env/test');
 
 var defaults = {
   root: join(__dirname, '..')
