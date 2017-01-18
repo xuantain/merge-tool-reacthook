@@ -1,10 +1,10 @@
 'use strict';
 
-var AppActions = require('./actions/AppActions'),
-    AppStore = require('./stores/AppStore'),
-    ProductStore = require('./stores/ProductStore'),
-    React = require('react'),
-    NavigationTop = require('./components/NavigationTop');
+var AppActions = require('./actions/AppActions');
+var AppStore = require('./stores/AppStore');
+var ProductStore = require('./stores/ProductStore');
+var React = require('react');
+var NavigationTop = require('./components/NavigationTop');
 
 var MyApp = React.createClass({
 

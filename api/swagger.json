@@ -15,7 +15,7 @@
         "description":"Get product info by id",
         "x-swagger-router-controller": "Product",
         "tags": ["Product"],
-        "operationId": "productGet",
+        "operationId": "list",
         "parameters": [
           {
             "name" : "id",
@@ -142,7 +142,7 @@
         "description":"Get category by id",
         "x-swagger-router-controller": "Category",
         "tags": ["Category"],
-        "operationId": "categoryGet",
+        "operationId": "loadAllCategories",
         "parameters": [
           {
             "name" : "id",
@@ -269,7 +269,7 @@
     "/user": {
       "get": {
         "summary": "User's Profile",
-        "description":"The User Profile endpoint returns information about the Uber user that has authorized with the application.",
+        "description":"The User Profile endpoint returns information about the user that has authorized with the application.",
         "x-swagger-router-controller": "User",
         "tags": ["User"],
         "operationId": "load",
@@ -509,31 +509,31 @@
       "properties" : {
         "name" : {
           "type" : "string",
-          "description" : "Name of the Uber user."
+          "description" : "Name of the user."
         },
         "email" : {
           "type" : "string",
-          "description" : "Email address of the Uber user"
+          "description" : "Email address of the user"
         },
         "username" : {
           "type" : "string",
-          "description" : "Name of the Uber user."
+          "description" : "Name of the user."
         },
         "provider" : {
           "type" : "string",
-          "description" : "Provider of the Uber user."
+          "description" : "Provider of the user."
         },
         "hashed_password" : {
           "type" : "string",
-          "description" : "hashed_password code of the Uber user."
+          "description" : "hashed_password code of the user."
         },
         "salt" : {
           "type" : "string",
-          "description" : "salt code of the Uber user."
+          "description" : "salt code of the user."
         },
         "authToken" : {
           "type" : "string",
-          "description" : "authToken code of the Uber user."
+          "description" : "authToken code of the user."
         }
       }
     },

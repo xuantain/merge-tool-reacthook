@@ -1,17 +1,22 @@
 'use strict';
 
-var AppDispatcher = require('./../dispatcher/AppDispatcher'),
-    AppConstants = require('./../constants/AppConstants'),
-    EventEmitter = require('events').EventEmitter,
-    _ = require('lodash');
+var AppDispatcher = require('./../dispatcher/AppDispatcher');
+var AppConstants = require('./../constants/AppConstants');
+var EventEmitter = require('events').EventEmitter;
+var _ = require('lodash');
 
-var CHANGE_EVENT = 'change',
-    ADD_ORDER_SUCCESS_EVENT = 'add order success',
-    ORDERS_CHANGE_EVENT = 'update orders';
+var CHANGE_EVENT = 'change';
+var ADD_ORDER_SUCCESS_EVENT = 'add order success';
+var ORDERS_CHANGE_EVENT = 'update orders';
 
-var _orders = [], _orderItems = [], _cats = [], _products = [], _shops = [],
-    _currentStatus = 'all', _currentShop = 'all',
-    _pages = 1, _perPage = 5, _currentPage = 1;
+var _orders = [];
+var _orderItems = [];
+var _cats = [];
+var _products = [];
+var _shops = [];
+var _currentStatus = 'all';
+var _currentShop = 'all';
+var _pages = 1, _perPage = 5, _currentPage = 1;
 
 var OrderStore = _.extend({}, EventEmitter.prototype, {
 

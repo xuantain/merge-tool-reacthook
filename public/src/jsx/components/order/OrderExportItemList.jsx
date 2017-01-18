@@ -1,8 +1,8 @@
 'use strict';
 
-var OrderStore = require('./../stores/OrderStore'),
-    React = require('react'),
-    OrderExportItemRow = require('./../components/OrderExportItemRow');
+var OrderStore = require('./../stores/OrderStore');
+var React = require('react');
+var OrderExportItemRow = require('./../components/OrderExportItemRow');
 
 function getState() {
   return {

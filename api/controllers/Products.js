@@ -1,10 +1,10 @@
 'use strict';
 
-var mongoose = require('mongoose'),
-    promise = require('bluebird'),
-    mongoose = promise.promisifyAll(mongoose),
-    Order = require('./../models/Order'),
-    Product = require('./../models/Product');
+var mongoose = require('mongoose');
+var promise = require('bluebird');
+var mongoose = promise.promisifyAll(mongoose);
+var Order = require('./../models/Order');
+var Product = require('./../models/Product');
 
 /**
  * Load all products

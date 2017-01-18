@@ -1,8 +1,8 @@
 'use strict';
 
-var mongoose = require('mongoose'),
-    LocalStrategy = require('passport-local').Strategy,
-    User = mongoose.model('User');
+var mongoose = require('mongoose');
+var LocalStrategy = require('passport-local').Strategy;
+var User = mongoose.model('User');
 
 module.exports = new LocalStrategy({
     usernameField: 'email',

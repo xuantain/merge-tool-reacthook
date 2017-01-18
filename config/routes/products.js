@@ -1,11 +1,11 @@
 'use strict';
 
-var join = require('path').join,
-    router = require('express').Router(),
-    products = require('../../api/controllers/Products'),
-    config = require('config'),
-    multer  = require('multer'),
-    upload = multer({ dest: join(config.root, 'public', 'uploads') });
+var join = require('path').join;
+var router = require('express').Router();
+var products = require('../../api/controllers/Products');
+var config = require('config');
+var multer  = require('multer');
+var upload = multer({ dest: join(config.root, 'public', 'uploads') });
 
 router.get('/:catId', products.loadAllProductsByCat);
 router.get('/:catId/:perPage/:page', products.loadAllProductsByCat);

@@ -1,7 +1,7 @@
 'use strict';
 
-var request = require('superagent'),
-    Promise = require('bluebird');
+var request = require('superagent');
+var Promise = require('bluebird');
 
 module.exports = {
 

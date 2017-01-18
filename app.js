@@ -1,12 +1,12 @@
 'use strict';
 
-var join = require('path').join,
-    express = require('express'),
-    mongoose = require('mongoose'),
-    passport = require('passport'),
-    promise = require('bluebird'),
-    mongoose = promise.promisifyAll(mongoose),
-    config = require('config');
+var join = require('path').join;
+var express = require('express');
+var mongoose = require('mongoose');
+var passport = require('passport');
+var promise = require('bluebird');
+var mongoose = promise.promisifyAll(mongoose);
+var config = require('config');
 
 var app = express();
 var port = process.env.PORT || 3000;

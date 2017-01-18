@@ -1,7 +1,7 @@
 'use strict';
 
-var fs = require('fs'),
-    envFile = require('path').join(__dirname, 'config', 'env.json');
+var fs = require('fs');
+var envFile = require('path').join(__dirname, 'config', 'env.json');
 
 // loading file env.json if it exists
 if(fs.existsSync(envFile)) {

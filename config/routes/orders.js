@@ -1,7 +1,7 @@
 'use strict';
 
-var router = require('express').Router(),
-    orders = require('../../api/controllers/Orders');
+var router = require('express').Router();
+var orders = require('../../api/controllers/Orders');
 
 router.get('/:perPage/:page/:shopId/:status', orders.loadAllOrdersByShop);
 router.get('/:perPage/:page/:shopId', orders.loadAllOrdersByShop);

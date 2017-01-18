@@ -1,7 +1,7 @@
 'use strict';
 
-var Dispatcher = require('flux').Dispatcher,
-    _ = require('lodash');
+var Dispatcher = require('flux').Dispatcher;
+var _ = require('lodash');
 
 var AppDispatcher = _.extend(new Dispatcher(), {
   handleViewAction: function (action) {

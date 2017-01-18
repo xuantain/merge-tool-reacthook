@@ -1,7 +1,7 @@
 'use strict';
 
-var React = require('react'),
-    ProductRow = require('./../components/ProductRow');
+var React = require('react');
+var ProductRow = require('./../components/ProductRow');
 
 module.exports = React.createClass({
   render: function() {

@@ -1,7 +1,7 @@
 'use strict';
 
-var join = require('path').join,
-    config = require('../config/config');
+var join = require('path').join;
+var config = require('../config/config');
 
 module.exports = function(app) {
   var swagger = require('swagger-noodle')({

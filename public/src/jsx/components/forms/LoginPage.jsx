@@ -1,7 +1,7 @@
 'use strict';
 
-var React = require('react/addons'),
-    InputElm = require('./../components/InputElement');
+var React = require('react/addons');
+var InputElm = require('./../components/InputElement');
 
 module.exports = React.createClass({
   mixins: [React.addons.LinkedStateMixin],
