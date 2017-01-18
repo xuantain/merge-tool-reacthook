@@ -5,10 +5,11 @@ var AppDispatcher = require('./../dispatcher/AppDispatcher');
 var EventEmitter = require('events').EventEmitter;
 var _ = require('lodash');
 
-var OrderForm = require('./../forms/OrderForm');
-var OrderOutForm = require('./../forms/OrderExportForm');
-var LoginForm = require('./../forms/LoginForm');
-var ProductForm = require('./../forms/ProductForm');
+// components
+var OrderForm = require('./../components/forms/OrderForm');
+var OrderOutForm = require('./../components/forms/OrderExportForm');
+var LoginForm = require('./../components/forms/LoginForm');
+var ProductForm = require('./../components/forms/ProductForm');
 
 var CHANGE_EVENT = 'change';
 

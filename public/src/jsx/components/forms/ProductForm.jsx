@@ -1,13 +1,13 @@
 'use strict';
 
-var ProductActions = require('./../actions/ProductActions');
-var ProductStore = require('./../stores/ProductStore');
-var utils = require('./../utils/utils');
+var ProductActions = require('./../../actions/ProductActions');
+var ProductStore = require('./../../stores/ProductStore');
+var utils = require('./../../utils/utils');
 var React = require('react');
-var ProductList = require('./../components/ProductList');
-var ProductAdding = require('./../components/ProductAdding');
-var Pagination = require('./../components/Pagination');
-var DropDownList = require('./../components/DropDownList');
+var ProductList = require('./../../components/product/ProductList');
+var ProductAdding = require('./../../components/product/ProductAdding');
+var Pagination = require('./../../components/pagination/Pagination');
+var DropDownList = require('./../../components/common/DropDownList');
 
 module.exports = React.createClass({
 

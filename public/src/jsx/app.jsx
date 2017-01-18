@@ -3,8 +3,10 @@
 var AppActions = require('./actions/AppActions');
 var AppStore = require('./stores/AppStore');
 var ProductStore = require('./stores/ProductStore');
+
+// components
 var React = require('react');
-var NavigationTop = require('./components/NavigationTop');
+var NavigationTop = require('./components/common/NavigationTop');
 
 var MyApp = React.createClass({
 

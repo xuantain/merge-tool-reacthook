@@ -1,8 +1,8 @@
 'use strict';
 
 var React = require('react');
-var MainNav = require('./../components/AdminMainNav');
-var AdminSidebar = require('./../components/AdminSidebar');
+var MainNav = require('./../../components/admin/AdminMainNav');
+var AdminSidebar = require('./../../components/admin/AdminSidebar');
 
 module.exports = React.createClass({
   render: function() {

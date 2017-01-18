@@ -1,6 +1,6 @@
 'use strict';
 
-var OrderActions = require('./../actions/OrderActions');
+var OrderActions = require('./../../actions/OrderActions');
 var React = require('react');
 
 module.exports = React.createClass({

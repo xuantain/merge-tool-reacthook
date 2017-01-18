@@ -1,12 +1,14 @@
 'use strict';
 
-var utils = require('./../utils/utils');
-var OrderActions = require('./../actions/OrderActions');
-var OrderStore = require('./../stores/OrderStore');
+var utils = require('./../../utils/utils');
+var OrderActions = require('./../../actions/OrderActions');
+var OrderStore = require('./../../stores/OrderStore');
+
+// components
 var React = require('react');
-var OrderList = require('./../components/OrderList');
-var Pagination = require('./../components/Pagination');
-var DropDownList = require('./../components/DropDownList');
+var OrderList = require('./../../components/order/OrderList');
+var Pagination = require('./../../components/pagination/Pagination');
+var DropDownList = require('./../../components/common/DropDownList');
 
 module.exports = React.createClass({
 

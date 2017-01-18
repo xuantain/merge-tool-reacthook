@@ -1,9 +1,11 @@
 'use strict';
 
-var OrderActions = require('./../actions/OrderActions');
-var OrderStore = require('./../stores/OrderStore');
+var OrderActions = require('./../../actions/OrderActions');
+var OrderStore = require('./../../stores/OrderStore');
+
+// components
 var React = require('react');
-var DropDownList = require('./../components/DropDownList');
+var DropDownList = require('./../../components/common/DropDownList');
 
 function getState() {
   return {

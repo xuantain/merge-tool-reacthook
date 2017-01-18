@@ -1,7 +1,7 @@
 'use strict';
 
 var React = require('react');
-var PanelOverview = require('./../components/PanelOverview');
+var PanelOverview = require('./../../components/common/PanelOverview');
 
 module.exports = React.createClass({
   render: function() {

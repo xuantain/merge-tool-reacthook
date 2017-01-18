@@ -1,7 +1,7 @@
 'use strict';
 
 var React = require('react');
-var OrderItem = require('./../components/OrderItem');
+var OrderItem = require('./../../components/order/OrderItem');
 
 module.exports = React.createClass({
   render: function() {

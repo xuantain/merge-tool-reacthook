@@ -1,7 +1,7 @@
 'use strict';
 
 var React = require('react');
-var PaginationItem = require('./../components/PaginationItem');
+var PaginationItem = require('./../../components/pagination/PaginationItem');
 
 module.exports = React.createClass({
   render: function() {
