@@ -139,10 +139,10 @@ module.exports = React.createClass({
   render: function() {
     return (
       <li className='dropdown'>
-          <a className='dropdown-toggle' data-toggle='dropdown' href={this.props.url}>
-              <i className={'fa '+ this.props.icon +' fa-fw'}></i>  <i className='fa fa-caret-down'></i>
-          </a>
-          { this.renderSubNav() }
+        <a className='dropdown-toggle' data-toggle='dropdown' href={this.props.url}>
+          <i className={'fa '+ this.props.icon +' fa-fw'}></i>  <i className='fa fa-caret-down'></i>
+        </a>
+        { this.renderSubNav() }
       </li>
     );
   }

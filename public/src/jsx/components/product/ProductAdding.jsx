@@ -97,14 +97,14 @@ module.exports = React.createClass({
     var catList = [];
 
     getCats.done(function(data) {
-        catList = data.categories;
-        catList.splice(0, 0, { _id: '', categoryName: 'Choose' });
-        this.setState({ categories: catList });
-      }.bind(this));
+      catList = data.categories;
+      catList.splice(0, 0, { _id: '', categoryName: 'Choose' });
+      this.setState({ categories: catList });
+    }.bind(this));
 
     getCats.fail(function(xhr, status, err) {
-        console.error('/api/catigories', status, err.toString());
-      });
+      console.error('/api/catigories', status, err.toString());
+    });
   },
   onChangeCategory: function(catId) {
     // change value
