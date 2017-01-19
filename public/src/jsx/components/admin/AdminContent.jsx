@@ -4,7 +4,8 @@ var React = require('react');
 var PanelOverview = require('./../../components/common/PanelOverview');
 var DataTable = require('./../../components/common/DataTable');
 
-module.exports = React.createClass({
+var AdminContent = React.createClass({
+
   render: function() {
     var dataPanelOverview = [
       {
@@ -36,6 +37,55 @@ module.exports = React.createClass({
         number: 13
       }
     ];
+    var dataTable = {
+      'title': 'DataTables Advanced Tables',
+      'columnsShown': [
+        {
+          'key': 'renderingEngine',
+          'title': 'Rendering engine'
+        },
+        {
+          'key': 'browser',
+          'title': 'Browser'
+        },
+        {
+          'key': 'platform',
+          'title': 'Platform(s)'
+        },
+        {
+          'key': 'engineVersion',
+          'title': 'Engine version'
+        },
+        {
+          'key': 'cssGrade',
+          'title': 'CSS grade'
+        },
+      ],
+      'rowsData': [
+        {
+          'renderingEngine': 'Trident',
+          'browser': 'Internet Explorer 5.0',
+          'platform': 'Win 95+',
+          'engineVersion': '5',
+          'cssGrade': 'C'
+        },
+        {
+          'renderingEngine': 'Trident',
+          'browser': 'Internet Explorer 7',
+          'platform': 'Win XP SP2+',
+          'engineVersion': '7',
+          'cssGrade': 'A'
+        },
+        {
+          'renderingEngine': 'Trident',
+          'browser': 'AOL browser (AOL desktop)',
+          'platform': 'Win XP',
+          'engineVersion': '6',
+          'cssGrade': 'A'
+        }
+      ]
+    };
+
     return (
       <div id='page-wrapper'>
         <div className='row'>
@@ -47,18 +97,18 @@ module.exports = React.createClass({
         {/*<!-- /.row -->*/}
         <div className="row">
         {
-          dataPanelOverview.map(function(pandelData, index) {
-            return <PanelOverview key={'pandelOverview-'+ index} data={pandelData} />
+          dataPanelOverview.map(function(panelData, index) {
+            return <PanelOverview key={'panelOverview-'+ index} data={panelData} />
           })
         }
         </div>
         <div className="row">
-        {
-          <DataTable/>
-        }
+          <DataTable title={dataTable.title} columnsShown={dataTable.columnsShown} rowsData={dataTable.rowsData} />
         </div>
+        {/*<!-- /#page-wrapper -->*/}
       </div>
-      //<!-- /#page-wrapper -->
     );
   }
 });
+
+module.exports = AdminContent;

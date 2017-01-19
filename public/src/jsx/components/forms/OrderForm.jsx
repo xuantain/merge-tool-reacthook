@@ -10,7 +10,7 @@ var OrderList = require('./../../components/order/OrderList');
 var Pagination = require('./../../components/pagination/Pagination');
 var DropDownList = require('./../../components/common/DropDownList');
 
-module.exports = React.createClass({
+var OrderForm = React.createClass({
 
   getInitialState: function() {
     return OrderStore.getState();
@@ -97,3 +97,5 @@ module.exports = React.createClass({
   }
 
 });
+
+module.exports = OrderForm;

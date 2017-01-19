@@ -2,7 +2,7 @@
 
 var React = require('react');
 
-module.exports = React.createClass({
+var ProductRow = React.createClass({
   getInitialState: function () {
     return ({
       isShowDetail: false
@@ -108,3 +108,5 @@ function formatCurrency (number) {
   // return parseInt(number).toLocaleString('de-DE', { style: 'currency', currency: 'VND' })
   return parseInt(number).toLocaleString('en-IN', { maximumSignificantDigits: 3 });
 }
+
+module.exports = ProductRow;

@@ -2,7 +2,7 @@
 
 var React = require('react');
 
-module.exports = React.createClass({
+var PaginationItem = React.createClass({
   changeValue: function(e) {
     e.preventDefault();
     this.props.moveToPage(this.props.page);
@@ -18,3 +18,5 @@ module.exports = React.createClass({
     );
   }
 });
+
+module.exports = PaginationItem;

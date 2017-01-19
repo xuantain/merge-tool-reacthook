@@ -3,7 +3,7 @@
 var React = require('react');
 var ProductRow = require('./../../components/product/ProductRow');
 
-module.exports = React.createClass({
+var ProductList = React.createClass({
   render: function() {
     return (
       <table className='table table-striped table-bordered table-hover'>
@@ -35,3 +35,5 @@ module.exports = React.createClass({
     );
   }
 });
+
+module.exports = ProductList;

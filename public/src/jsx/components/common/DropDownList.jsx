@@ -24,7 +24,7 @@ module.exports = React.createClass({
     var propKey = props._key;
     var propValue = props._value;
     return (
-      <select className={'form-control '+ props._class} id={props._ref}
+      <select className={'form-control ${props._class}'} id={props._ref}
               name={props._ref} value={props.value} onChange={this.onChangeData}>
       {
         props.dataList.map(function(data) {

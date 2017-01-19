@@ -3,7 +3,7 @@
 var React = require('react');
 var OrderExportItemRow = require('./../../components/order/OrderExportItemRow');
 
-module.exports = React.createClass({
+var OrderItem = React.createClass({
 
   getInitialState: function () {
     return ({
@@ -144,3 +144,5 @@ var OrderDetailItemList = React.createClass({
   }
 
 });
+
+module.exports = OrderItem;

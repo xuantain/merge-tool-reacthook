@@ -9,7 +9,7 @@ var ProductAdding = require('./../../components/product/ProductAdding');
 var Pagination = require('./../../components/pagination/Pagination');
 var DropDownList = require('./../../components/common/DropDownList');
 
-module.exports = React.createClass({
+var ProductForm = React.createClass({
 
   getInitialState: function() {
     return ProductStore.getState();
@@ -91,3 +91,5 @@ module.exports = React.createClass({
   }
 
 });
+
+module.exports = ProductForm;

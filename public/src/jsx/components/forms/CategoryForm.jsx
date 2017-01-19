@@ -2,7 +2,7 @@
 
 var React = require('react');
 
-module.exports = React.createClass({
+var CategoryForm = React.createClass({
   render: function() {
     return (
       <div className='col-xs-12 col-sm-12'>
@@ -34,3 +34,5 @@ module.exports = React.createClass({
     );
   }
 });
+
+module.exports = CategoryForm;

@@ -4,7 +4,7 @@ var React = require('react');
 var MainNav = require('./../../components/admin/AdminMainNav');
 var AdminSidebar = require('./../../components/admin/AdminSidebar');
 
-module.exports = React.createClass({
+var AdminHeader = React.createClass({
   render: function() {
     return (
       <nav className='navbar navbar-default navbar-static-top' role='navigation' style={{'marginBottom': 0}}>
@@ -28,3 +28,5 @@ module.exports = React.createClass({
     );
   }
 });
+
+module.exports = AdminHeader;

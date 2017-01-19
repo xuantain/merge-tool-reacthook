@@ -11,39 +11,51 @@ module.exports = React.createClass({
   },
 
   render: function () {
+
+    var props = this.props;
+    var columnsShown = this._getColumnTitles();
+
     return (
       <div className="col-lg-12">
         <div className="panel panel-default">
-          <div className="panel-heading">
-            DataTables Advanced Tables
-          </div>
+          {
+            props.title ?
+              <div className="panel-heading">
+                { props.title }
+              </div>
+              :
+              ''
+          }
           <div className="panel-body">
             <div className="dataTable_wrapper">
               <table className="table table-striped table-bordered table-hover" id="dataTables-example">
                 <thead>
                   <tr>
-                    <th>Rendering engine</th>
-                    <th>Browser</th>
-                    <th>Platform(s)</th>
-                    <th>Engine version</th>
-                    <th>CSS grade</th>
+                    {
+                      columnsShown.map(function (column, index) {
+                        return (
+                          <td key={index}>{column.title}</td>
+                        );
+                      })
+                    }
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="odd gradeX">
-                    <td>Trident</td>
-                    <td>Internet Explorer 4.0</td>
-                    <td>Win 95+</td>
-                    <td className="center">4</td>
-                    <td className="center">X</td>
-                  </tr>
-                  <tr className="even gradeC">
-                    <td>Trident</td>
-                    <td>Internet Explorer 5.0</td>
-                    <td>Win 95+</td>
-                    <td className="center">5</td>
-                    <td className="center">C</td>
-                  </tr>
+                  {
+                    props.rowsData.map(function (row, rowIndex) {
+                      return (
+                        <tr key={rowIndex}>
+                          {
+                            columnsShown.map(function (column, colIndex) {
+                              return (
+                                <td key={colIndex}>{row[column.key]}</td>
+                              );
+                            })
+                          }
+                        </tr>
+                      );
+                    })
+                  }
                 </tbody>
               </table>
             </div>
@@ -51,5 +63,27 @@ module.exports = React.createClass({
         </div>
       </div>
     );
+  },
+
+  _getColumnTitles: function () {
+
+    var columnsShown = this.props.columnsShown || [];
+
+    if (columnsShown.length > 0) {
+      columnsShown.map(function (column) {
+        // TODO: Should be update later
+        column.title = column.title || column.key;
+      });
+    } else {
+      var columnKeys = this.props.rowsData[0];
+      for (var key in columnKeys) {
+        if (columnKeys.hasOwnProperty(key)) {
+          columnsShown.push({ 'key': key, 'title': key });
+        }
+      }
+    }
+
+    return columnsShown;
   }
+
 });

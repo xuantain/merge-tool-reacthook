@@ -4,7 +4,7 @@ var React = require('react');
 var InputElm = require('./../../components/common/InputElement');
 var DropDownList = require('./../../components/common/DropDownList');
 
-module.exports = React.createClass({
+var ProductAdding = React.createClass({
   getInitialState: function() {
     return {
       categories: []
@@ -149,3 +149,5 @@ module.exports = React.createClass({
     );
   }
 });
+
+module.exports = ProductAdding;

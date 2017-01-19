@@ -4,9 +4,11 @@ var React = require('react');
 var MenuItem = require('./../../components/admin/AdminSidebarMenuItem');
 
 var AdminSidebar = React.createClass({
+
   componentDidMount: function() {
-      $('#side-menu').metisMenu();
+    $('#side-menu').metisMenu();
   },
+
   render: function() {
 
     var menu = [
@@ -35,7 +37,7 @@ var AdminSidebar = React.createClass({
         }
       },
       {
-        'url': 'javascript:;',
+        'url': '#table',
         'title': ' Tables',
         'icon': 'fa fa-table fa-fw'
       },
@@ -163,10 +165,11 @@ var AdminSidebar = React.createClass({
 
                 return (
                   <MenuItem
+                    key={`menuItem-${index}`}
                     className={item.className}
                     url={item.url}
-                    icon={item.icon}
                     title={item.title}
+                    icon={item.icon}
                     span={item.span}
                     submenu={item.submenu}
                   />

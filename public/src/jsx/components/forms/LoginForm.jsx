@@ -3,7 +3,7 @@
 var React = require('react/addons');
 var InputElm = require('./../../components/common/InputElement');
 
-module.exports = React.createClass({
+var LoginForm = React.createClass({
   mixins: [React.addons.LinkedStateMixin],
   getInitialState: function() {
     return {
@@ -71,3 +71,5 @@ module.exports = React.createClass({
     );
   }
 });
+
+module.exports = LoginForm;

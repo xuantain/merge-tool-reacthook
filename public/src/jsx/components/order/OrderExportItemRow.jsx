@@ -3,7 +3,7 @@
 var OrderActions = require('./../../actions/OrderActions');
 var React = require('react');
 
-module.exports = React.createClass({
+var OrderExportItemRow = React.createClass({
 
   render: function() {
     var rowData = this.props.rowData;
@@ -33,3 +33,5 @@ module.exports = React.createClass({
   }
 
 });
+
+module.exports = OrderExportItemRow;

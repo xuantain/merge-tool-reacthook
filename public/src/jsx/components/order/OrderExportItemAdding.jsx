@@ -14,7 +14,7 @@ function getState() {
   };
 }
 
-module.exports = React.createClass({
+var OrderExportItemAdding = React.createClass({
 
   getInitialState: function() {
     return getState();
@@ -173,3 +173,5 @@ module.exports = React.createClass({
   }
 
 });
+
+module.exports = OrderExportItemAdding;

@@ -8,11 +8,11 @@ var MenuItem = React.createClass({
     url: React.PropTypes.string.isRequired,
     title: React.PropTypes.string.isRequired,
     icon: React.PropTypes.string,
-    span: React.PropTypes.string,
-    submenu: React.PropTypes.objectOf({
-      className: React.PropTypes.string,
-      itemList: React.PropTypes.array
-    })
+    span: React.PropTypes.string
+    // submenu: React.PropTypes.objectOf({
+    //   className: React.PropTypes.string,
+    //   itemList: React.PropTypes.array
+    // })
   },
   getDefaultProps: function() {
     return {
@@ -34,8 +34,8 @@ var MenuItem = React.createClass({
         </a>
         {
           this.props.submenu && this.props.submenu !== undefined
-          && this.props.submenu.hasOwnProperty('itemList')
-            && this.props.submenu.itemList.length > 0 ?
+            && this.props.submenu.hasOwnProperty('itemList')
+              && this.props.submenu.itemList.length > 0 ?
             <SubMenuItem
               className={this.props.submenu.className}
               itemList={this.props.submenu.itemList}
@@ -63,7 +63,8 @@ var SubMenuItem = React.createClass({
       {
         this.props.itemList.map(function(item, index) {
           return (
-            <MenuItem key={'item'+index}
+            <MenuItem
+              key={'item'+index}
               className={item.className}
               url={item.url}
               icon={item.icon}
@@ -78,17 +79,19 @@ var SubMenuItem = React.createClass({
   }
 });
 
-module.exports = React.createClass({
+var AdminSidebarMenuItem = React.createClass({
   render: function() {
     return (
       <MenuItem
         className={this.props.className}
         url={this.props.url}
-        icon={this.props.icon}
         title={this.props.title}
+        icon={this.props.icon}
         span={this.props.span}
         submenu={this.props.submenu}
       />
     );
   }
 });
+
+module.exports = AdminSidebarMenuItem;

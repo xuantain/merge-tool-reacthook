@@ -10,7 +10,7 @@ var DropDownList = require('./../../components/common/DropDownList');
 var OrderExportItemList = require('./../../components/order/OrderExportItemList');
 var OrderExportItemAdding = require('./../../components/order/OrderExportItemAdding');
 
-module.exports = React.createClass({
+var OrderExportForm = React.createClass({
 
   componentDidMount: function() {
     OrderStore.addSuccessListener(this._resetInput);
@@ -150,3 +150,5 @@ module.exports = React.createClass({
   }
 
 });
+
+module.exports = OrderExportForm;

@@ -85,11 +85,12 @@ var LastType = React.createClass({
   }
 });
 
-module.exports = React.createClass({
+var AdminMainNavItem = React.createClass({
   renderSubNav: function() {
     var subNavContent = '';
 
     if(this.props.list && this.props.list !== undefined && this.props.list.length > 0) {
+
       var SubNavItem;
 
       switch (this.props.type) {
@@ -105,10 +106,13 @@ module.exports = React.createClass({
         case 'user':
           SubNavItem = UserType;
           break;
+        default:
+          SubNavItem = LastType;
+          break;
       }
 
       var navList = this.props.list.map(function(subNavData, index) {
-        var navReturn = '';
+        var navReturn = null;
 
         if(subNavData.isLastItem) {
           navReturn = <LastType key={'SubNavItem-'+ index} data={subNavData} />;
@@ -116,13 +120,17 @@ module.exports = React.createClass({
           navReturn = <SubNavItem key={'SubNavItem-'+ index} data={subNavData} />;
         }
 
-        return ({ navReturn })
+        return navReturn;
+
+      }).filter(function (item) {
+        return item != null;
       });
+
       var navListReturn = [];
 
       for (var i = 0; i < navList.length; i++) {
-        if ( (this.props.divider && 0 !== i) || navList.length === i+1 ) {
-          navListReturn.push(<li className='divider'></li>);
+        if ( (i > 0 && this.props.divider) || navList.length === i+1 ) {
+          navListReturn.push(<li key={`nav-${i}`} className='divider'></li>);
         }
         navListReturn.push(navList[i]);
       }
@@ -147,3 +155,5 @@ module.exports = React.createClass({
     );
   }
 });
+
+module.exports = AdminMainNavItem;

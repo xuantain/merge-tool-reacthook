@@ -3,7 +3,7 @@
 var React = require('react');
 var PaginationItem = require('./../../components/pagination/PaginationItem');
 
-module.exports = React.createClass({
+var Pagination = React.createClass({
   render: function() {
     var items = [];
     for (var i = 1; i <= this.props.pages; i++) {
@@ -18,3 +18,5 @@ module.exports = React.createClass({
     );
   }
 });
+
+module.exports = Pagination;

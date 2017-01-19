@@ -2,7 +2,7 @@
 
 var React = require('react');
 
-module.exports = React.createClass({
+var OrderImportForm = React.createClass({
   getInitialState: function() {
     return {};
   },
@@ -12,3 +12,5 @@ module.exports = React.createClass({
     return (<h1>Hi</h1>);
   }
 });
+
+module.exports = OrderImportForm;
