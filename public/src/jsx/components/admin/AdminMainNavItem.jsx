@@ -120,6 +120,10 @@ var AdminMainNavItem = React.createClass({
           navReturn = <SubNavItem key={'SubNavItem-'+ index} data={subNavData} />;
         }
 
+        // NOTE: Warning: Any use of a keyed object should be wrapped in React.addons.createFragment(object) before being passed as a child.
+        // This Warning cause by 2 reasons:
+        // 1. http://stackoverflow.com/questions/31713858/any-use-of-a-keyed-object-should-be-wrapped-in-react-addons-createfragmentobjec
+        // 2. return ({navReturn});
         return navReturn;
 
       }).filter(function (item) {
