@@ -38,6 +38,8 @@ var AdminContent = React.createClass({
       }
     ];
     var dataTable = {
+      'sortable': true,
+      'paginate': true,
       'title': 'DataTables Advanced Tables',
       'columnsShown': [
         {
@@ -103,7 +105,13 @@ var AdminContent = React.createClass({
         }
         </div>
         <div className="row">
-          <DataTable title={dataTable.title} columnsShown={dataTable.columnsShown} rowsData={dataTable.rowsData} />
+          <DataTable
+            sortable={dataTable.sortable}
+            paginate={dataTable.paginate}
+            title={dataTable.title}
+            columnsShown={dataTable.columnsShown}
+            rowsData={dataTable.rowsData}
+          />
         </div>
         {/*<!-- /#page-wrapper -->*/}
       </div>

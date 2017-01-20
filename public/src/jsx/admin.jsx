@@ -6,6 +6,7 @@ var AdminContent = require('./components/admin/AdminContent');
 
 var AdminPage = React.createClass({
   render: function() {
+    // TODO: require wrap AdminPage which contents all AdminPage info (AdminHeader, AdminSidebar, AdminContent)
     return (
       <div>
         <AdminHeader />

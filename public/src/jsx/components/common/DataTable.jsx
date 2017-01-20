@@ -1,13 +1,27 @@
 'use strict';
 
 var React = require('react');
+var utils = require('./../../utils/utils');
 
 module.exports = React.createClass({
 
+  getInitialState: function () {
+    return {
+      'tableId': utils.guid()
+    }
+  },
+
   componentDidMount: function() {
-    $('#dataTables-example').DataTable({
-      responsive: true
-    });
+    var sortable = this.props.sortable || false;
+    var paginate = this.props.paginate || false;
+
+    var options = {
+      'responsive': true,
+      'sort': sortable,
+      'paginate': paginate
+    };
+
+    $('#dataTables-' + this.state.tableId).DataTable(options);
   },
 
   render: function () {
@@ -28,7 +42,7 @@ module.exports = React.createClass({
           }
           <div className="panel-body">
             <div className="dataTable_wrapper">
-              <table className="table table-striped table-bordered table-hover" id="dataTables-example">
+              <table className="table table-striped table-bordered table-hover" id={`dataTables-${this.state.tableId}`}>
                 <thead>
                   <tr>
                     {
