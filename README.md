@@ -1,8 +1,7 @@
 # sales-manager
-An application for manage sales.
 
-# Installation
-For installation, please follow these steps:
+## Installation
+Please follow these steps:
 
 Step 1: `$ git clone https://github.com/justocode/sales-manager.git`
 
@@ -14,8 +13,8 @@ Step 4: `$ npm install -g gulp`
 
 Step 5: `$ bower install`
 
-# Usage
-For creating example data, please run command below:
+## Usage
+Please run command below to generate example data:
 
 `$ mongorestore dump`
 
