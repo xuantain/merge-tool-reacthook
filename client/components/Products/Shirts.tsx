@@ -2,7 +2,6 @@ import React from 'react';
 import clsx from 'clsx';
 import { createStyles, lighten, makeStyles, useTheme, Theme } from '@material-ui/core/styles';
 
-
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -11,33 +10,35 @@ import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
 import Toolbar from '@material-ui/core/Toolbar';
-
-
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
-import DeleteIcon from '@material-ui/icons/Delete';
-import FilterListIcon from '@material-ui/icons/FilterList';
-import Layout from '../Layout/Layout';
-
-
 import Button from '@material-ui/core/Button';
-import SaveIcon from '@material-ui/icons/Save';
-import EditIcon from '@material-ui/icons/Edit';
 import Chip from '@material-ui/core/Chip';
 import Box from '@material-ui/core/Box';
+
+import GetApp from '@material-ui/icons/GetApp';
+import SyncIcon from '@material-ui/icons/Sync';
+import AddIcon from '@material-ui/icons/Add';
+import DeleteIcon from '@material-ui/icons/Delete';
+import FilterListIcon from '@material-ui/icons/FilterList';
+import SaveIcon from '@material-ui/icons/Save';
+import EditIcon from '@material-ui/icons/Edit';
+
+// Components
+import Layout from '../Layout/Layout';
+
+// Colors
 import lightGreen from '@material-ui/core/colors/lightGreen';
 import blue from '@material-ui/core/colors/blue';
 import red from '@material-ui/core/colors/red';
 import cyan from '@material-ui/core/colors/cyan';
 
-
 import Modal from '@material-ui/core/Modal';
-
 
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
@@ -47,6 +48,7 @@ import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 
 import tShirt from '../../../assets/img/tshirt.webp';
+import { callbackify } from 'util';
 
 interface Data {
   name: string;
@@ -300,7 +302,7 @@ const useStyles = makeStyles((theme: Theme) =>
       boxShadow: theme.shadows[5],
       outline: 'none',
       padding: theme.spacing(1, 1, 1),
-      marginTop: theme.spacing(1),
+      left: `calc(10% - ${theme.spacing(1)})`,
       marginBottom: theme.spacing(1),
     },
     instructions: {
@@ -485,15 +487,19 @@ export default function EnhancedTable() {
       <div className={classes.root}>
         <Box component="span" display="block" className={classes.buttonGroup}>
           <Button size="medium" variant="contained" color="primary" className={clsx(classes.button, classes.cyan)} onClick={handleOpen}>
+            <SyncIcon className={classes.rightIcon} />
             Re-sync Error Products
           </Button>
           <Button size="medium" variant="contained" color="primary" className={clsx(classes.button, classes.red)} onClick={handleOpen}>
+            <DeleteIcon className={classes.rightIcon} />
             Delete
           </Button>
           <Button size="medium" variant="contained" color="primary" className={clsx(classes.button, classes.green)} onClick={handleOpen}>
+            <GetApp className={classes.rightIcon} />
             Export
           </Button>
           <Button size="medium" variant="contained" color="primary" className={clsx(classes.button, classes.blue)} onClick={handleOpen}>
+            <AddIcon className={classes.rightIcon} />
             New Shirt
           </Button>
         </Box>
