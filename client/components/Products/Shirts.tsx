@@ -1,21 +1,18 @@
 import React from 'react';
 import clsx from 'clsx';
 import { createStyles, lighten, makeStyles, useTheme, Theme } from '@material-ui/core/styles';
+import { Order } from '../common/OrderType';
 
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
-import TableSortLabel from '@material-ui/core/TableSortLabel';
-import Toolbar from '@material-ui/core/Toolbar';
+import TableCell from '@material-ui/core/TableCell';
+import TablePagination from '@material-ui/core/TablePagination';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
-import Tooltip from '@material-ui/core/Tooltip';
 import Switch from '@material-ui/core/Switch';
 import Button from '@material-ui/core/Button';
 import Chip from '@material-ui/core/Chip';
@@ -25,12 +22,13 @@ import GetApp from '@material-ui/icons/GetApp';
 import SyncIcon from '@material-ui/icons/Sync';
 import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
-import FilterListIcon from '@material-ui/icons/FilterList';
 import SaveIcon from '@material-ui/icons/Save';
 import EditIcon from '@material-ui/icons/Edit';
 
 // Components
 import Layout from '../Layout/Layout';
+import EnhancedTableToolbar from '../Products/EnhancedTableToolbar';
+import EnhancedTableHead from '../Products/EnhancedTableHead';
 
 // Colors
 import lightGreen from '@material-ui/core/colors/lightGreen';
@@ -104,149 +102,12 @@ function stableSort<T>(array: T[], cmp: (a: T, b: T) => number) {
   return stabilizedThis.map(el => el[0]);
 }
 
-type Order = 'asc' | 'desc';
-
 function getSorting<K extends keyof any>(
   order: Order,
   orderBy: K,
 ): (a: { [key in K]: number | string }, b: { [key in K]: number | string }) => number {
   return order === 'desc' ? (a, b) => desc(a, b, orderBy) : (a, b) => -desc(a, b, orderBy);
 }
-
-interface HeadRow {
-  disablePadding: boolean;
-  id: keyof Data;
-  label: string;
-  numeric: boolean;
-}
-
-const headRows: HeadRow[] = [
-  { id: 'status', numeric: false, disablePadding: false, label: 'Status' },
-  { id: 'image', numeric: true, disablePadding: false, label: 'Image' },
-  { id: 'name', numeric: false, disablePadding: true, label: 'Name' },
-  { id: 'sku', numeric: false, disablePadding: false, label: 'SKU' },
-];
-
-interface EnhancedTableProps {
-  numSelected: number;
-  onRequestSort: (event: React.MouseEvent<unknown>, property: keyof Data) => void;
-  onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => void;
-  order: Order;
-  orderBy: string;
-  rowCount: number;
-}
-
-function EnhancedTableHead(props: EnhancedTableProps) {
-  const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props;
-  const createSortHandler = (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
-    onRequestSort(event, property);
-  };
-
-  return (
-    <TableHead>
-      <TableRow>
-        <TableCell padding="checkbox">
-          <Checkbox
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={numSelected === rowCount}
-            onChange={onSelectAllClick}
-            inputProps={{ 'aria-label': 'select all desserts' }}
-          />
-        </TableCell>
-        {headRows.map(row => (
-          <TableCell
-            key={row.id}
-            align={row.numeric ? 'right' : 'left'}
-            padding={row.disablePadding ? 'none' : 'default'}
-            sortDirection={orderBy === row.id ? order : false}
-          >
-            <TableSortLabel
-              active={orderBy === row.id}
-              direction={order}
-              onClick={createSortHandler(row.id)}
-            >
-              {row.label}
-            </TableSortLabel>
-          </TableCell>
-        ))}
-      </TableRow>
-    </TableHead>
-  );
-}
-
-const useToolbarStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      paddingLeft: theme.spacing(2),
-      paddingRight: theme.spacing(1),
-    },
-    highlight:
-      theme.palette.type === 'light'
-        ? {
-            color: theme.palette.secondary.main,
-            backgroundColor: lighten(theme.palette.secondary.light, 0.85),
-          }
-        : {
-            color: theme.palette.text.primary,
-            backgroundColor: theme.palette.secondary.dark,
-          },
-    spacer: {
-      flex: '1 1 100%',
-    },
-    actions: {
-      color: theme.palette.text.secondary,
-    },
-    title: {
-      flex: '0 0 auto',
-    },
-  }),
-);
-
-interface EnhancedTableToolbarProps {
-  numSelected: number;
-}
-
-const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
-  const theme = useTheme();
-  const classes = useToolbarStyles(theme);
-  const { numSelected } = props;
-
-  return (
-    <Toolbar
-      className={clsx(classes.root, {
-        [classes.highlight]: numSelected > 0,
-      })}
-    >
-      <div className={classes.title}>
-        {numSelected > 0 ? (
-          <Typography color="inherit" variant="subtitle1">
-            {numSelected} selected
-          </Typography>
-        ) : (
-          <Typography variant="h6" id="tableTitle">
-            Shirts
-          </Typography>
-        )}
-      </div>
-      <div className={classes.spacer} />
-      <div className={classes.actions}>
-        {numSelected > 0 ? (
-          <Tooltip title="Delete">
-            <IconButton aria-label="delete">
-              <DeleteIcon />
-            </IconButton>
-          </Tooltip>
-        ) : (
-          <Tooltip title="Filter list">
-            <IconButton aria-label="filter list">
-              <FilterListIcon />
-            </IconButton>
-          </Tooltip>
-        )}
-      </div>
-    </Toolbar>
-  );
-};
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -320,7 +181,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-export default function EnhancedTable() {
+const EnhancedTable = () => {
   const theme = useTheme();
   const classes = useStyles(theme);
   const [order, setOrder] = React.useState<Order>('asc');
@@ -506,11 +367,7 @@ export default function EnhancedTable() {
         <Paper className={classes.paper}>
           <EnhancedTableToolbar numSelected={selected.length} />
           <div className={classes.tableWrapper}>
-            <Table
-              className={classes.table}
-              aria-labelledby="tableTitle"
-              size={dense ? 'small' : 'medium'}
-            >
+            <Table className={classes.table} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
               <EnhancedTableHead
                 numSelected={selected.length}
                 order={order}
@@ -537,10 +394,7 @@ export default function EnhancedTable() {
                         selected={isItemSelected}
                       >
                         <TableCell padding="checkbox">
-                          <Checkbox
-                            checked={isItemSelected}
-                            inputProps={{ 'aria-labelledby': labelId }}
-                          />
+                          <Checkbox checked={isItemSelected} inputProps={{ 'aria-labelledby': labelId }} />
                         </TableCell>
                         <TableCell align="right">
                           <Chip label={row.status} color="primary" className={classes.chip} />
@@ -595,10 +449,7 @@ export default function EnhancedTable() {
             onChangeRowsPerPage={handleChangeRowsPerPage}
           />
         </Paper>
-        <FormControlLabel
-          control={<Switch checked={dense} onChange={handleChangeDense} />}
-          label="Dense padding"
-        />
+        <FormControlLabel label="Dense padding" control={<Switch checked={dense} onChange={handleChangeDense} />} />
       </div>
       <Modal
         aria-labelledby="simple-modal-title"
@@ -677,3 +528,5 @@ export default function EnhancedTable() {
     </Layout>
   );
 }
+
+export default EnhancedTable;

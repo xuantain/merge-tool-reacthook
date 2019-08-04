@@ -13,7 +13,7 @@ interface Props {
   };
 }
 
-function ProductsPage({ query }: Props) {
+const ProductsPage = ({ query }: Props) => {
   return <Products query={query} />;
 }
 

@@ -3,7 +3,7 @@ import Product from '../components/Product/Product';
 import services from '../services';
 import isServer from 'detect-node';
 
-function ProductPage() {
+const ProductPage = () => {
   return <Product />;
 }
 

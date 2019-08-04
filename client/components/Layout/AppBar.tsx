@@ -1,50 +1,17 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import Container from '@material-ui/core/Container';
-import Toolbar from '@material-ui/core/Toolbar';
-import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
-import Typography from '@material-ui/core/Typography';
-import Badge from '@material-ui/core/Badge';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
-import ShoppingBasket from '@material-ui/icons/ShoppingBasket';
-import MoreIcon from '@material-ui/icons/MoreVert';
-import Box from '@material-ui/core/Box';
 import utils from '../../utils';
 import SettingsIcon from '@material-ui/icons/Settings';
-import CameraAltIcon from '@material-ui/icons/CameraAlt';
 import GroupWorkIcon from '@material-ui/icons/GroupWork';
-import { useSelector } from 'react-redux';
+import CollectionsIcon from '@material-ui/icons/Collections';
+import WbAutoIcon from '@material-ui/icons/WbAuto';
 
-function TabPanel(props) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <Typography
-      component="div"
-      role="tabpanel"
-      hidden={value !== index}
-      id={`scrollable-force-tabpanel-${index}`}
-      aria-labelledby={`scrollable-force-tab-${index}`}
-      {...other}
-    >
-      <Box p={3}>{children}</Box>
-    </Typography>
-  );
-}
-
-TabPanel.propTypes = {
-  children: PropTypes.node,
-  index: PropTypes.any.isRequired,
-  value: PropTypes.any.isRequired,
-};
-
-function a11yProps(index) {
+function a11yProps(index: number) {
   return {
     id: `scrollable-force-tab-${index}`,
     'aria-controls': `scrollable-force-tabpanel-${index}`,
@@ -96,26 +63,48 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-function PrimaryAppBar() {
-  const totalQuantity: number = useSelector(({ checkout }) => {
-    let totalQuantity = 0;
-
-    if (checkout.data) {
-      totalQuantity = checkout.data.lineItems.edges.reduce((total, lineItem) => {
-        return total + lineItem.node.quantity;
-      }, 0);
-    }
-
-    return totalQuantity;
-  });
-
+const PrimaryAppBar = () => {
   const theme = useTheme();
   const classes = useStyles(theme);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
   const [value, setValue] = React.useState(0);
 
-  function handleChange(event, newValue) {
+  interface MenuItem {
+    label: string;
+    link: string;
+    icon: React.ReactElement;
+  }
+
+  const appMenus: MenuItem[] = [
+    {
+      label: 'Shirts',
+      link: '/shirts',
+      icon: <WbAutoIcon/>
+    },
+    {
+      label: 'Designs',
+      link: '/designs',
+      icon: <CollectionsIcon/>
+    },
+    {
+      label: 'Patterns',
+      link: '/patterns',
+      icon: <GroupWorkIcon/>
+    },
+    // {
+    //   label: 'Mockups',
+    //   link: '/mockups',
+    //   icon: <CameraAltIcon/>
+    // },
+    {
+      label: 'Settings',
+      link: '/settings',
+      icon: <SettingsIcon/>
+    },
+  ];
+
+  function handleChange(event: React.ChangeEvent<{}>, newValue: number) {
     setValue(newValue);
   }
 
@@ -123,7 +112,7 @@ function PrimaryAppBar() {
     setMobileMoreAnchorEl(null);
   }
 
-  function handleMobileMenuOpen(event) {
+  function handleMobileMenuOpen(event: any) {
     setMobileMoreAnchorEl(event.currentTarget);
   }
 
@@ -135,11 +124,9 @@ function PrimaryAppBar() {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
-      <MenuItem onClick={() => utils.link({ path: '/' })}>Home</MenuItem>
-      <MenuItem onClick={() => utils.link({ path: '/products' })}>Products</MenuItem>
-      <MenuItem onClick={() => utils.link({ path: '/products' })}>Products</MenuItem>
-      <MenuItem onClick={() => utils.link({ path: '/products' })}>Products</MenuItem>
-      <MenuItem onClick={() => utils.link({ path: '/products' })}>Products</MenuItem>
+      {appMenus.map((menuItem, index) => (
+        <MenuItem key={menuItem.label} {...a11yProps(index)} onClick={() => utils.link({ path: menuItem.link })}>{menuItem.label}</MenuItem>
+      ))}
     </Menu>
   );
 
@@ -153,13 +140,11 @@ function PrimaryAppBar() {
           scrollButtons="on"
           indicatorColor="primary"
           textColor="primary"
-          aria-label="scrollable force tabs example"
+          aria-label="scrollable force tabs"
         >
-          <Tab label="Shirts" icon={<ShoppingBasket />} {...a11yProps(0)} onClick={() => utils.link({ path: '/' })} />
-          <Tab label="Mugs" icon={<ShoppingBasket />} {...a11yProps(1)} onClick={() => utils.link({ path: '/products' })} />
-          <Tab label="Groups" icon={<GroupWorkIcon />} {...a11yProps(2)} onClick={() => utils.link({ path: '/products' })} />
-          <Tab label="Mockup" icon={<CameraAltIcon />} {...a11yProps(3)} onClick={() => utils.link({ path: '/products' })} />
-          <Tab label="Settings" icon={<SettingsIcon />} {...a11yProps(4)} onClick={() => utils.link({ path: '/products' })} />
+          {appMenus.map((menuItem, index) => (
+            <Tab key={menuItem.label} label={menuItem.label} icon={menuItem.icon} {...a11yProps(index)} onClick={() => utils.link({ path: menuItem.link })} />
+          ))}
         </Tabs>
       </AppBar>
       {renderMobileMenu}

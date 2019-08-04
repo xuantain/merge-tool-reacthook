@@ -13,7 +13,7 @@ interface Props {
   };
 }
 
-function ShirtsPage({ query }: Props) {
+const ShirtsPage = ({ query }: Props) => {
   return <Shirts />;
 }
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import Shirts from '../components/Products/Shirts';
 
-function HomePage() {
+const HomePage = () => {
   return <Shirts />;
 }
 
