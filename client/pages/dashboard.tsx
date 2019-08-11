@@ -1,5 +1,5 @@
 import React from 'react';
-import Shirts from '../components/Products/Shirts';
+import Dashboard from '../components/Products/Dashboard';
 import services from '../services';
 import isServer from 'detect-node';
 import { ProductSortKeys } from '../models';
@@ -13,11 +13,11 @@ interface Props {
   };
 }
 
-const ShirtsPage = ({ query }: Props) => {
-  return <Shirts />;
+const DashboardPage = ({ query }: Props) => {
+  return <Dashboard />;
 }
 
-ShirtsPage.getInitialProps = async context => {
+DashboardPage.getInitialProps = async context => {
   const { store } = context;
   const { query, sortKey, sortIndex, reverse } = context.query;
 
@@ -37,4 +37,4 @@ ShirtsPage.getInitialProps = async context => {
   return { query: transformedQuery };
 };
 
-export default ShirtsPage;
+export default DashboardPage;

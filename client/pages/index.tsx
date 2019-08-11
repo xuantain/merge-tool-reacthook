@@ -1,8 +1,8 @@
 import React from 'react';
-import Shirts from '../components/Products/Shirts';
+import Dashboard from '../components/Products/Dashboard';
 
 const HomePage = () => {
-  return <Shirts />;
+  return <Dashboard />;
 }
 
 export default HomePage;

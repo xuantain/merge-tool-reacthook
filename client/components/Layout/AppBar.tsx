@@ -1,4 +1,5 @@
 import React from 'react';
+import { useRouter } from 'next/router';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
@@ -9,11 +10,11 @@ import utils from '../../utils';
 import SettingsIcon from '@material-ui/icons/Settings';
 import GroupWorkIcon from '@material-ui/icons/GroupWork';
 import CollectionsIcon from '@material-ui/icons/Collections';
-import WbAutoIcon from '@material-ui/icons/WbAuto';
+import DashboardIcon from '@material-ui/icons/Dashboard';
 
 function a11yProps(index: number) {
   return {
-    id: `scrollable-force-tab-${index}`,
+    'id': `scrollable-force-tab-${index}`,
     'aria-controls': `scrollable-force-tabpanel-${index}`,
   };
 }
@@ -66,6 +67,8 @@ const useStyles = makeStyles(theme => ({
 const PrimaryAppBar = () => {
   const theme = useTheme();
   const classes = useStyles(theme);
+  const router = useRouter();
+  // const { pathname } = router.pathname;
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
   const [value, setValue] = React.useState(0);
@@ -78,9 +81,9 @@ const PrimaryAppBar = () => {
 
   const appMenus: MenuItem[] = [
     {
-      label: 'Shirts',
-      link: '/shirts',
-      icon: <WbAutoIcon/>
+      label: 'Dashboard',
+      link: '/dashboard',
+      icon: <DashboardIcon/>
     },
     {
       label: 'Designs',
@@ -103,6 +106,14 @@ const PrimaryAppBar = () => {
       icon: <SettingsIcon/>
     },
   ];
+
+  let pageIndex = appMenus.findIndex((menuitem) => {
+    if (router.asPath === '/') {
+      return true;
+    }
+
+    return router.asPath.toString().indexOf(menuitem.link) > -1;
+  });
 
   function handleChange(event: React.ChangeEvent<{}>, newValue: number) {
     setValue(newValue);
@@ -134,7 +145,7 @@ const PrimaryAppBar = () => {
     <div className={classes.grow}>
       <AppBar position="fixed" color="default">
         <Tabs
-          value={value}
+          value={pageIndex}
           onChange={handleChange}
           variant="scrollable"
           scrollButtons="on"

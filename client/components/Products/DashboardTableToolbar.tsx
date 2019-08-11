@@ -10,7 +10,7 @@ import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
 import FilterListIcon from '@material-ui/icons/FilterList';
 
-interface EnhancedTableToolbarProps {
+interface DashboardTableToolbarProps {
   numSelected: number;
 }
 
@@ -42,7 +42,7 @@ const useToolbarStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
+const DashboardTableToolbar = (props: DashboardTableToolbarProps) => {
   const theme = useTheme();
   const classes = useToolbarStyles(theme);
   const { numSelected } = props;
@@ -80,4 +80,4 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
   );
 };
 
-export default EnhancedTableToolbar;
+export default DashboardTableToolbar;

@@ -1,20 +1,11 @@
 import React from 'react';
-import Designs from '../components/Designs/Designs';
+import NewProduct from '../components/Products/NewProduct';
 
-interface Props {
-  query: {
-    query: string;
-    reverse: boolean;
-    sortKey: ProductSortKeys;
-    sortIndex: number;
-  };
+const NewProductPage = () => {
+  return <NewProduct />;
 }
 
-const DesignsPage = ({ query }: Props) => {
-  return <Designs query={query} />;
-}
-
-DesignsPage.getInitialProps = async context => {
+NewProductPage.getInitialProps = async context => {
   const { store } = context;
   const { query, sortKey, sortIndex, reverse } = context.query;
 
@@ -34,4 +25,4 @@ DesignsPage.getInitialProps = async context => {
   return { query: transformedQuery };
 };
 
-export default DesignsPage;
+export default NewProductPage;

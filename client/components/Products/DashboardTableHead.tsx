@@ -1,6 +1,4 @@
 import React from 'react';
-import clsx from 'clsx';
-import { createStyles, lighten, makeStyles, useTheme, Theme } from '@material-ui/core/styles';
 import { Order } from '../common/OrderType';
 
 import TableHead from '@material-ui/core/TableHead';
@@ -10,39 +8,20 @@ import TableSortLabel from '@material-ui/core/TableSortLabel';
 
 import Checkbox from '@material-ui/core/Checkbox';
 
-interface Data {
-  name: string;
-  image: string;
-  status: string;
-  sku: string;
-}
 
-interface HeadRow {
-  disablePadding: boolean;
-  id: keyof Data;
-  label: string;
-  numeric: boolean;
-}
-
-const headRows: HeadRow[] = [
-  { id: 'status', numeric: false, disablePadding: false, label: 'Status' },
-  { id: 'image', numeric: true, disablePadding: false, label: 'Image' },
-  { id: 'name', numeric: false, disablePadding: true, label: 'Name' },
-  { id: 'sku', numeric: false, disablePadding: false, label: 'SKU' },
-];
-
-interface EnhancedTableProps {
+interface DashboardTableProps {
   numSelected: number;
-  onRequestSort: (event: React.MouseEvent<unknown>, property: keyof Data) => void;
+  onRequestSort: (event: React.MouseEvent<unknown>, property: keyof any) => void;
   onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => void;
   order: Order;
   orderBy: string;
   rowCount: number;
+  headRows: any[];
 }
 
-const EnhancedTableHead = (props: EnhancedTableProps) => {
-  const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props;
-  const createSortHandler = (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
+const DashboardTableHead = (props: DashboardTableProps) => {
+  const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, headRows } = props;
+  const createSortHandler = (property: keyof any) => (event: React.MouseEvent<unknown>) => {
     onRequestSort(event, property);
   };
 
@@ -78,4 +57,4 @@ const EnhancedTableHead = (props: EnhancedTableProps) => {
   );
 }
 
-export default EnhancedTableHead;
+export default DashboardTableHead;

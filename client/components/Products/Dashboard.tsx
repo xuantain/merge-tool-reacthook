@@ -8,13 +8,12 @@ import TableBody from '@material-ui/core/TableBody';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import TablePagination from '@material-ui/core/TablePagination';
-import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
-import IconButton from '@material-ui/core/IconButton';
 import Switch from '@material-ui/core/Switch';
 import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
 import Chip from '@material-ui/core/Chip';
 import Box from '@material-ui/core/Box';
 
@@ -24,11 +23,12 @@ import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
 import SaveIcon from '@material-ui/icons/Save';
 import EditIcon from '@material-ui/icons/Edit';
+import ContentCopyIcon from '@material-ui/icons/FileCopy';
 
 // Components
 import Layout from '../Layout/Layout';
-import EnhancedTableToolbar from '../Products/EnhancedTableToolbar';
-import EnhancedTableHead from '../Products/EnhancedTableHead';
+import DashboardTableToolbar from '../Products/DashboardTableToolbar';
+import DashboardTableHead from '../Products/DashboardTableHead';
 
 // Colors
 import lightGreen from '@material-ui/core/colors/lightGreen';
@@ -36,23 +36,22 @@ import blue from '@material-ui/core/colors/blue';
 import red from '@material-ui/core/colors/red';
 import cyan from '@material-ui/core/colors/cyan';
 
-import Modal from '@material-ui/core/Modal';
-
-import Stepper from '@material-ui/core/Stepper';
-import Step from '@material-ui/core/Step';
-import StepLabel from '@material-ui/core/StepLabel';
-
-import GridList from '@material-ui/core/GridList';
-import GridListTile from '@material-ui/core/GridListTile';
-
 import tShirt from '../../../assets/img/tshirt.webp';
-import { callbackify } from 'util';
+import utils from '../../utils';
 
 interface Data {
   name: string;
   image: string;
   status: string;
   sku: string;
+  createdAt: string;
+}
+
+interface HeadRow {
+  disablePadding: boolean;
+  id: keyof Data;
+  label: string;
+  numeric: boolean;
 }
 
 function createData(
@@ -60,45 +59,62 @@ function createData(
   image: string,
   status: string,
   sku: string,
+  createdAt: string,
 ): Data {
-  return { name, image, status, sku };
+  return { name, image, status, sku, createdAt };
 }
 
 // const demoImg = 'https://cdn.shopify.com/s/files/1/1312/0893/products/004.jpg?v=1491851162';
 const demoImg = tShirt;
 
+const headRows: HeadRow[] = [
+  { id: 'status', numeric: false, disablePadding: false, label: 'Status' },
+  { id: 'image', numeric: false, disablePadding: false, label: 'Image' },
+  { id: 'name', numeric: false, disablePadding: true, label: 'Name' },
+  { id: 'sku', numeric: false, disablePadding: false, label: 'SKU' },
+  { id: 'createdAt', numeric: false, disablePadding: false, label: 'Created at' },
+];
+
 const rows = [
-  createData('Shirt 1', demoImg, 'Synced', 'Tee-20190729-001'),
-  createData('Shirt 2', demoImg, 'Synced', 'Tee-20190729-002'),
-  createData('Shirt 3', demoImg, 'Synced', 'Tee-20190729-003'),
-  createData('Shirt 4', demoImg, 'Synced', 'Tee-20190729-004'),
-  createData('Shirt 5', demoImg, 'Synced', 'Tee-20190729-005'),
-  createData('Shirt 6', demoImg, 'Synced', 'Tee-20190729-006'),
-  createData('Shirt 7', demoImg, 'Synced', 'Tee-20190729-007'),
-  createData('Shirt 8', demoImg, 'Synced', 'Tee-20190729-008'),
-  createData('Shirt 9', demoImg, 'Synced', 'Tee-20190729-009'),
-  createData('Shirt 10', demoImg, 'Synced', 'Tee-20190729-010'),
-  createData('Shirt 11', demoImg, 'Synced', 'Tee-20190729-011'),
-  createData('Shirt 12', demoImg, 'Synced', 'Tee-20190729-012'),
+  createData('Shirt 1', demoImg, 'Synced', 'Tee-20190729-001', '2019-07-01 14h:15m:31s'),
+  createData('Shirt 2', demoImg, 'Synced', 'Tee-20190729-002', '2019-07-01 10h:36m:21s'),
+  createData('Shirt 3', demoImg, 'Synced', 'Tee-20190729-003', '2019-07-01 14h:45m:15s'),
+  createData('Shirt 4', demoImg, 'Synced', 'Tee-20190729-004', '2019-07-02 13h:35m:01s'),
+  createData('Shirt 5', demoImg, 'Synced', 'Tee-20190729-005', '2019-07-02 17h:25m:31s'),
+  createData('Shirt 6', demoImg, 'Synced', 'Tee-20190729-006', '2019-07-02 11h:35m:33s'),
+  createData('Shirt 7', demoImg, 'Synced', 'Tee-20190729-007', '2019-07-02 18h:25m:31s'),
+  createData('Shirt 8', demoImg, 'Synced', 'Tee-20190729-008', '2019-07-02 11h:55m:22s'),
+  createData('Shirt 9', demoImg, 'Synced', 'Tee-20190729-009', '2019-07-03 19h:25m:39s'),
+  createData('Shirt 10', demoImg, 'Synced', 'Tee-20190729-010', '2019-07-03 10h:15m:45s'),
+  createData('Shirt 11', demoImg, 'Synced', 'Tee-20190729-011', '2019-07-03 10h:15m:34s'),
+  createData('Shirt 12', demoImg, 'Synced', 'Tee-20190729-012', '2019-07-03 11h:15m:55s'),
 ];
 
 function desc<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
   }
+
   if (b[orderBy] > a[orderBy]) {
     return 1;
   }
+
   return 0;
 }
 
 function stableSort<T>(array: T[], cmp: (a: T, b: T) => number) {
   const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
+
   stabilizedThis.sort((a, b) => {
     const order = cmp(a[0], b[0]);
-    if (order !== 0) return order;
+
+    if (order !== 0) {
+      return order;
+    }
+
     return a[1] - b[1];
   });
+
   return stabilizedThis.map(el => el[0]);
 }
 
@@ -181,16 +197,15 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const EnhancedTable = () => {
+const Dashboard = () => {
   const theme = useTheme();
   const classes = useStyles(theme);
   const [order, setOrder] = React.useState<Order>('asc');
   const [orderBy, setOrderBy] = React.useState<keyof Data>('name');
   const [selected, setSelected] = React.useState<string[]>([]);
   const [page, setPage] = React.useState(0);
-  const [dense, setDense] = React.useState(false);
+  const [dense, setDense] = React.useState(true);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [open, setOpen] = React.useState(false);
 
   function handleRequestSort(event: React.MouseEvent<unknown>, property: keyof Data) {
     const isDesc = orderBy === property && order === 'desc';
@@ -213,11 +228,14 @@ const EnhancedTable = () => {
 
     if (selectedIndex === -1) {
       newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
+    }
+    else if (selectedIndex === 0) {
       newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
+    }
+    else if (selectedIndex === selected.length - 1) {
       newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
+    }
+    else if (selectedIndex > 0) {
       newSelected = newSelected.concat(
         selected.slice(0, selectedIndex),
         selected.slice(selectedIndex + 1),
@@ -240,148 +258,51 @@ const EnhancedTable = () => {
     setDense(event.target.checked);
   }
 
-  // MODEL
-  function rand() {
-    return Math.round(Math.random() * 20) - 10;
-  }
-
-  function getModalStyle() {
-    const top = 50 + rand();
-    const left = 50 + rand();
-
-    return {
-      top: `${top}%`,
-      left: `${left}%`,
-      transform: `translate(-${top}%, -${left}%)`,
-    };
-  }
-
-  // getModalStyle is not a pure function, we roll the style only on the first render
-  const [modalStyle] = React.useState(getModalStyle);
-
-  const handleOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
   const isSelected = (name: string) => selected.indexOf(name) !== -1;
 
   const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
-
-  function getSteps() {
-    return ['Select campaign settings', 'Create an ad group', 'Create an ad'];
-  }
-
-  const [activeStep, setActiveStep] = React.useState(0);
-  const [skipped, setSkipped] = React.useState(new Set<number>());
-  const steps = getSteps();
-
-  function isStepOptional(step: number) {
-    return step === 1;
-  }
-
-  function isStepSkipped(step: number) {
-    return skipped.has(step);
-  }
-
-  function handleNext() {
-    let newSkipped = skipped;
-    if (isStepSkipped(activeStep)) {
-      newSkipped = new Set(newSkipped.values());
-      newSkipped.delete(activeStep);
-    }
-
-    setActiveStep(prevActiveStep => prevActiveStep + 1);
-    setSkipped(newSkipped);
-  }
-
-  function handleBack() {
-    setActiveStep(prevActiveStep => prevActiveStep - 1);
-  }
-
-  function handleSkip() {
-    if (!isStepOptional(activeStep)) {
-      // You probably want to guard against something like this,
-      // it should never occur unless someone's actively trying to break something.
-      throw new Error("You can't skip a step that isn't optional.");
-    }
-
-    setActiveStep(prevActiveStep => prevActiveStep + 1);
-    setSkipped(prevSkipped => {
-      const newSkipped = new Set(prevSkipped.values());
-      newSkipped.add(activeStep);
-      return newSkipped;
-    });
-  }
-
-  function handleReset() {
-    setActiveStep(0);
-  }
-
-  function getStepContent(step: number) {
-    switch (step) {
-      case 0:
-        return 'Select campaign settings...';
-      case 1:
-        return 'What is an ad group anyways?';
-      case 2:
-        return 'This is the bit I really care about!';
-      default:
-        return 'Unknown step';
-    }
-  }
-
-  const tileData = [
-    {
-      img: 'https://cdn.shopify.com/s/files/1/1312/0893/products/004.jpg?v=1491851162',
-      title: 'Image',
-      author: 'author',
-      cols: 2,
-    },
-  ];
 
   return (
     <Layout>
       <div className={classes.root}>
         <Box component="span" display="block" className={classes.buttonGroup}>
-          <Button size="medium" variant="contained" color="primary" className={clsx(classes.button, classes.cyan)} onClick={handleOpen}>
+          <Button size="medium" variant="contained" color="primary" className={clsx(classes.button, classes.cyan)} onClick={() => {}}>
             <SyncIcon className={classes.rightIcon} />
             Re-sync Error Products
           </Button>
-          <Button size="medium" variant="contained" color="primary" className={clsx(classes.button, classes.red)} onClick={handleOpen}>
+          <Button size="medium" variant="contained" color="primary" className={clsx(classes.button, classes.red)} onClick={() => {}}>
             <DeleteIcon className={classes.rightIcon} />
-            Delete
+            Recycle
           </Button>
-          <Button size="medium" variant="contained" color="primary" className={clsx(classes.button, classes.green)} onClick={handleOpen}>
+          <Button size="medium" variant="contained" color="primary" className={clsx(classes.button, classes.green)} onClick={() => {}}>
             <GetApp className={classes.rightIcon} />
             Export
           </Button>
-          <Button size="medium" variant="contained" color="primary" className={clsx(classes.button, classes.blue)} onClick={handleOpen}>
+          <Button size="medium" variant="contained" color="primary" className={clsx(classes.button, classes.blue)}
+            onClick={() => utils.link({path: '/newProduct'})}>
             <AddIcon className={classes.rightIcon} />
-            New Shirt
+            New Product
           </Button>
         </Box>
         <Paper className={classes.paper}>
-          <EnhancedTableToolbar numSelected={selected.length} />
+          <DashboardTableToolbar numSelected={selected.length} />
           <div className={classes.tableWrapper}>
             <Table className={classes.table} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
-              <EnhancedTableHead
+              <DashboardTableHead
                 numSelected={selected.length}
                 order={order}
                 orderBy={orderBy}
                 onSelectAllClick={handleSelectAllClick}
                 onRequestSort={handleRequestSort}
                 rowCount={rows.length}
+                headRows={headRows}
               />
               <TableBody>
                 {stableSort(rows, getSorting(order, orderBy))
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row, index) => {
                     const isItemSelected = isSelected(row.name.toString());
-                    const labelId = `enhanced-table-checkbox-${index}`;
+                    const labelId = `dashboard-table-checkbox-${index}`;
 
                     return (
                       <TableRow
@@ -393,34 +314,30 @@ const EnhancedTable = () => {
                         key={row.name}
                         selected={isItemSelected}
                       >
-                        <TableCell padding="checkbox">
+                        <TableCell padding="checkbox" component="th">
                           <Checkbox checked={isItemSelected} inputProps={{ 'aria-labelledby': labelId }} />
                         </TableCell>
-                        <TableCell align="right">
-                          <Chip label={row.status} color="primary" className={classes.chip} />
+                        <TableCell component="th">
+                          {/* <Chip label={row.status} color="primary" className={classes.chip} /> */}
+                          <Typography id="productStatus" color={"primary"}>{row.status}</Typography>
                         </TableCell>
-                        <TableCell align="right">
+                        <TableCell>
                           <img src={row.image.toString()} alt={row.name.toString()} className={classes.rowImg} />
                         </TableCell>
                         <TableCell component="th" id={labelId} scope="row" padding="none">
                           {row.name}
                         </TableCell>
-                        <TableCell align="right">{row.sku}</TableCell>
-                        <TableCell align="center">
-                          <Button size="small" variant="contained" color="primary" className={classes.button}>
-                            <EditIcon className={classes.rightIcon} />
-                          </Button>
-                          <Button size="small" variant="contained" color="secondary" className={classes.button}>
-                            <SaveIcon className={classes.leftIcon} />
-                          </Button>
-                          <Button size="small" variant="contained" color="secondary" className={classes.button}>
-                            <DeleteIcon className={classes.rightIcon} />
-                          </Button>
+                        <TableCell component="th">
+                          {row.sku}
                         </TableCell>
-                        <TableCell align="center">
-                          <Button size="small" variant="contained" color="secondary" className={classes.button}>
-                            Bulk insert
-                          </Button>
+                        <TableCell component="th">
+                          {row.createdAt}
+                        </TableCell>
+                        <TableCell align="right" component="th" id="actionGroups">
+                          <EditIcon color="primary" className={classes.rightIcon} onClick={() => {}} />
+                          <SaveIcon color="primary" className={classes.rightIcon} />
+                          <DeleteIcon color="secondary" className={classes.rightIcon} />
+                          <ContentCopyIcon color="primary" className={classes.rightIcon} />
                         </TableCell>
                       </TableRow>
                     );
@@ -451,82 +368,8 @@ const EnhancedTable = () => {
         </Paper>
         <FormControlLabel label="Dense padding" control={<Switch checked={dense} onChange={handleChangeDense} />} />
       </div>
-      <Modal
-        aria-labelledby="simple-modal-title"
-        aria-describedby="simple-modal-description"
-        open={open}
-        onClose={handleClose}
-      >
-        <div style={modalStyle} className={classes.modal}>
-          <Stepper activeStep={activeStep}>
-            {steps.map((label, index) => {
-              const stepProps: { completed?: boolean } = {};
-              const labelProps: { optional?: React.ReactNode } = {};
-              if (isStepOptional(index)) {
-                labelProps.optional = <Typography variant="caption">Optional</Typography>;
-              }
-              if (isStepSkipped(index)) {
-                stepProps.completed = false;
-              }
-              return (
-                <Step key={label} {...stepProps}>
-                  <StepLabel {...labelProps}>{label}</StepLabel>
-                </Step>
-              );
-            })}
-          </Stepper>
-          <div>
-            {activeStep === steps.length ? (
-              <div>
-                <Typography className={classes.instructions}>
-                  All steps completed - you&apos;re finished
-                </Typography>
-                <Button onClick={handleReset} className={classes.button}>
-                  Reset
-                </Button>
-              </div>
-            ) : (
-              <div>
-                <Typography className={classes.instructions}>
-                  {/* {getStepContent(activeStep)} */}
-                  <GridList cellHeight={160} className={classes.gridList} cols={3}>
-                    {tileData.map(tile => (
-                      <GridListTile key={tile.img} cols={tile.cols || 1}>
-                        <img src={tile.img} alt={tile.title} />
-                      </GridListTile>
-                    ))}
-                  </GridList>
-                </Typography>
-                <div>
-                  <Button disabled={activeStep === 0} onClick={handleBack} className={classes.button}>
-                    Back
-                  </Button>
-                  {isStepOptional(activeStep) && (
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={handleSkip}
-                      className={classes.button}
-                    >
-                      Skip
-                    </Button>
-                  )}
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleNext}
-                    className={classes.button}
-                  >
-                    {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-                  </Button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </Modal>
     </Layout>
   );
 }
 
-export default EnhancedTable;
+export default Dashboard;
