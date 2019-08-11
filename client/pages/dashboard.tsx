@@ -1,5 +1,5 @@
 import React from 'react';
-import Dashboard from '../components/Products/Dashboard';
+import Dashboard from '../components/Dashboard/Dashboard';
 import services from '../services';
 import isServer from 'detect-node';
 import { ProductSortKeys } from '../models';

@@ -17,6 +17,7 @@ import Typography from '@material-ui/core/Typography';
 import Chip from '@material-ui/core/Chip';
 import Box from '@material-ui/core/Box';
 
+import IconButton from '@material-ui/core/IconButton';
 import GetApp from '@material-ui/icons/GetApp';
 import SyncIcon from '@material-ui/icons/Sync';
 import AddIcon from '@material-ui/icons/Add';
@@ -27,8 +28,8 @@ import ContentCopyIcon from '@material-ui/icons/FileCopy';
 
 // Components
 import Layout from '../Layout/Layout';
-import DashboardTableToolbar from '../Products/DashboardTableToolbar';
-import DashboardTableHead from '../Products/DashboardTableHead';
+import DashboardTableToolbar from './DashboardTableToolbar';
+import DashboardTableHead from './DashboardTableHead';
 
 // Colors
 import lightGreen from '@material-ui/core/colors/lightGreen';
@@ -334,10 +335,18 @@ const Dashboard = () => {
                           {row.createdAt}
                         </TableCell>
                         <TableCell align="right" component="th" id="actionGroups">
-                          <EditIcon color="primary" className={classes.rightIcon} onClick={() => {}} />
-                          <SaveIcon color="primary" className={classes.rightIcon} />
-                          <DeleteIcon color="secondary" className={classes.rightIcon} />
-                          <ContentCopyIcon color="primary" className={classes.rightIcon} />
+                          <IconButton size="small" className={classes.rightIcon}>
+                            <EditIcon color="primary" onClick={() => {}} />
+                          </IconButton>
+                          <IconButton size="small" className={classes.rightIcon}>
+                            <SaveIcon color="primary" />
+                          </IconButton>
+                          <IconButton size="small" className={classes.rightIcon}>
+                            <DeleteIcon color="secondary" />
+                          </IconButton>
+                          <IconButton size="small" className={classes.rightIcon}>
+                            <ContentCopyIcon color="primary" />
+                          </IconButton>
                         </TableCell>
                       </TableRow>
                     );

@@ -1,5 +1,5 @@
 import React from 'react';
-import NewProduct from '../components/Products/NewProduct';
+import NewProduct from '../components/Product/NewProduct';
 
 const NewProductPage = () => {
   return <NewProduct />;
