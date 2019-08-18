@@ -3,6 +3,10 @@ import { createStyles, makeStyles, useTheme, Theme } from '@material-ui/core/sty
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 
+import mergeImages from 'merge-images';
+import { saveAs } from 'file-saver';
+import { Image, createCanvas } from 'canvas';
+
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
@@ -49,6 +53,10 @@ const useStyles = makeStyles((theme: Theme) =>
     green: {
       background: lightGreen[500],
     },
+    demoImg: {
+      width: 200,
+      height: 200
+    }
   }),
 );
 
@@ -107,11 +115,42 @@ const NewProductPage = () => {
   }
 
   function generateMockups () {
-    console.log('Generate mockup');
+    for (const designName in currentMockups) {
+      if (currentMockups.hasOwnProperty(designName)) {
+
+        const patterns = currentMockups[designName];
+
+        patterns.map((patternName: string) => {
+          mergeDesignToPattern(designName, patternName);
+        });
+      }
+    }
   }
 
   function mergeDesignToPattern (designName: string, patternName: string) {
     console.log('mergeDesignToPattern', designName, patternName);
+
+    const designIdx = designFiles.findIndex((design: any) => {
+      return design.fileName === designName;
+    });
+    const designSrc = designFiles[designIdx].imagePreviewUrl;
+
+    const patternIdx = patternFiles.findIndex((pattern: any) => {
+      return pattern.fileName === patternName;
+    });
+    const patternSrc = patternFiles[patternIdx].imagePreviewUrl;
+
+    mergeImages([
+      { src: patternSrc },
+      { src: designSrc }
+    ])
+    .then((b64: any) => {
+
+      // const canvas = createCanvas(1000, 1000, 'pdf');
+      // const img = new Image();
+      saveAs(b64, designName + patternName);
+      // document.querySelector('#demoImg').src = b64;
+    });
   }
 
   return (
@@ -166,6 +205,8 @@ const NewProductPage = () => {
           }
           </>
       )}
+
+      <img id="demoImg" src="" alt="" className={classes.demoImg}/>
     </div>
   );
 }
