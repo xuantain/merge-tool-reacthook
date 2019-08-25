@@ -1,5 +1,5 @@
 import React from 'react';
-import { Order } from '../common/OrderType';
+import { Order } from '../DataTable/DataInterface';
 
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';

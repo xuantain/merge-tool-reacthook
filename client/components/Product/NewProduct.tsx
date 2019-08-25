@@ -5,7 +5,6 @@ import Button from '@material-ui/core/Button';
 
 import mergeImages from 'merge-images';
 import { saveAs } from 'file-saver';
-import { Image, createCanvas } from 'canvas';
 
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
@@ -142,9 +141,11 @@ const NewProductPage = () => {
 
     mergeImages([
       { src: patternSrc },
-      { src: designSrc }
+      { src: designSrc, opacity: 0.3 }
     ])
     .then((b64: any) => {
+
+      // TODO: Save to the dropbox folder and then wait for syncing to the server. Get the image link afterward to update to "data" for each mockup
 
       // const canvas = createCanvas(1000, 1000, 'pdf');
       // const img = new Image();
@@ -167,7 +168,6 @@ const NewProductPage = () => {
           );
         })}
       </Stepper>
-
       {
         activeStep === steps.length ? (
           <Grid container className={classes.actions}>
@@ -205,8 +205,6 @@ const NewProductPage = () => {
           }
           </>
       )}
-
-      <img id="demoImg" src="" alt="" className={classes.demoImg}/>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useRef, SyntheticInputEvent } from 'react';
+import React, { useRef } from 'react';
 import { createStyles, makeStyles, useTheme, Theme } from '@material-ui/core/styles';
 
 import Card from '@material-ui/core/Card';
@@ -33,14 +33,14 @@ const StepUploadDesign = (props: any) => {
   const theme = useTheme();
   const classes = useStyles(theme);
   const inputRef = useRef(null);
-  let { designFiles, setDesignFiles } = props;
+  const { designFiles, setDesignFiles } = props;
 
   function handleChange(e: React.MouseEvent) {
     e.preventDefault();
     inputRef.current.click();
   }
 
-  function onDrop(e: SyntheticInputEvent<HTMLInputElement>) {
+  function onDrop(e: React.ChangeEvent<HTMLInputElement>) {
     e.preventDefault();
 
     let reader = new FileReader();

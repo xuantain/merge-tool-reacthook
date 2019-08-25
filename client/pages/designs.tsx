@@ -1,5 +1,6 @@
 import React from 'react';
 import Designs from '../components/Designs/Designs';
+import { ProductSortKeys } from '../models';
 
 interface Props {
   query: {

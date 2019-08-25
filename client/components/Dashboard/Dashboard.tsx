@@ -1,7 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
 import { createStyles, lighten, makeStyles, useTheme, Theme } from '@material-ui/core/styles';
-import { Order } from '../common/OrderType';
+import { Order } from '../DataTable/DataInterface';
 
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -335,8 +335,8 @@ const Dashboard = () => {
                           {row.createdAt}
                         </TableCell>
                         <TableCell align="right" component="th" id="actionGroups">
-                          <IconButton size="small" className={classes.rightIcon}>
-                            <EditIcon color="primary" onClick={() => {}} />
+                          <IconButton size="small" className={classes.rightIcon} onClick={() => {}} >
+                            <EditIcon color="primary"/>
                           </IconButton>
                           <IconButton size="small" className={classes.rightIcon}>
                             <SaveIcon color="primary" />
