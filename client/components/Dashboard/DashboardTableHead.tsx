@@ -5,6 +5,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
+import Typography from '@material-ui/core/Typography';
 
 import Checkbox from '@material-ui/core/Checkbox';
 
@@ -52,6 +53,9 @@ const DashboardTableHead = (props: DashboardTableProps) => {
             </TableSortLabel>
           </TableCell>
         ))}
+        <TableCell>
+          <Typography id="actions" color={"primary"}>Actions</Typography>
+        </TableCell>
       </TableRow>
     </TableHead>
   );

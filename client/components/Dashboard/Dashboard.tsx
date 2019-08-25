@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import clsx from 'clsx';
 import { createStyles, lighten, makeStyles, useTheme, Theme } from '@material-ui/core/styles';
 import { Order } from '../DataTable/DataInterface';
@@ -40,6 +40,7 @@ import cyan from '@material-ui/core/colors/cyan';
 import tShirt from '../../../assets/img/tshirt.webp';
 import utils from '../../utils';
 
+
 interface Data {
   name: string;
   image: string;
@@ -76,20 +77,20 @@ const headRows: HeadRow[] = [
   { id: 'createdAt', numeric: false, disablePadding: false, label: 'Created at' },
 ];
 
-const rows = [
-  createData('Shirt 1', demoImg, 'Synced', 'Tee-20190729-001', '2019-07-01 14h:15m:31s'),
-  createData('Shirt 2', demoImg, 'Synced', 'Tee-20190729-002', '2019-07-01 10h:36m:21s'),
-  createData('Shirt 3', demoImg, 'Synced', 'Tee-20190729-003', '2019-07-01 14h:45m:15s'),
-  createData('Shirt 4', demoImg, 'Synced', 'Tee-20190729-004', '2019-07-02 13h:35m:01s'),
-  createData('Shirt 5', demoImg, 'Synced', 'Tee-20190729-005', '2019-07-02 17h:25m:31s'),
-  createData('Shirt 6', demoImg, 'Synced', 'Tee-20190729-006', '2019-07-02 11h:35m:33s'),
-  createData('Shirt 7', demoImg, 'Synced', 'Tee-20190729-007', '2019-07-02 18h:25m:31s'),
-  createData('Shirt 8', demoImg, 'Synced', 'Tee-20190729-008', '2019-07-02 11h:55m:22s'),
-  createData('Shirt 9', demoImg, 'Synced', 'Tee-20190729-009', '2019-07-03 19h:25m:39s'),
-  createData('Shirt 10', demoImg, 'Synced', 'Tee-20190729-010', '2019-07-03 10h:15m:45s'),
-  createData('Shirt 11', demoImg, 'Synced', 'Tee-20190729-011', '2019-07-03 10h:15m:34s'),
-  createData('Shirt 12', demoImg, 'Synced', 'Tee-20190729-012', '2019-07-03 11h:15m:55s'),
-];
+// const rows = [
+//   createData('Shirt 1', demoImg, 'Synced', 'Tee-20190729-001', '2019-07-01 14h:15m:31s'),
+//   createData('Shirt 2', demoImg, 'Synced', 'Tee-20190729-002', '2019-07-01 10h:36m:21s'),
+//   createData('Shirt 3', demoImg, 'Synced', 'Tee-20190729-003', '2019-07-01 14h:45m:15s'),
+//   createData('Shirt 4', demoImg, 'Synced', 'Tee-20190729-004', '2019-07-02 13h:35m:01s'),
+//   createData('Shirt 5', demoImg, 'Synced', 'Tee-20190729-005', '2019-07-02 17h:25m:31s'),
+//   createData('Shirt 6', demoImg, 'Synced', 'Tee-20190729-006', '2019-07-02 11h:35m:33s'),
+//   createData('Shirt 7', demoImg, 'Synced', 'Tee-20190729-007', '2019-07-02 18h:25m:31s'),
+//   createData('Shirt 8', demoImg, 'Synced', 'Tee-20190729-008', '2019-07-02 11h:55m:22s'),
+//   createData('Shirt 9', demoImg, 'Synced', 'Tee-20190729-009', '2019-07-03 19h:25m:39s'),
+//   createData('Shirt 10', demoImg, 'Synced', 'Tee-20190729-010', '2019-07-03 10h:15m:45s'),
+//   createData('Shirt 11', demoImg, 'Synced', 'Tee-20190729-011', '2019-07-03 10h:15m:34s'),
+//   createData('Shirt 12', demoImg, 'Synced', 'Tee-20190729-012', '2019-07-03 11h:15m:55s'),
+// ];
 
 function desc<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -201,12 +202,16 @@ const useStyles = makeStyles((theme: Theme) =>
 const Dashboard = () => {
   const theme = useTheme();
   const classes = useStyles(theme);
-  const [order, setOrder] = React.useState<Order>('asc');
-  const [orderBy, setOrderBy] = React.useState<keyof Data>('name');
-  const [selected, setSelected] = React.useState<string[]>([]);
-  const [page, setPage] = React.useState(0);
-  const [dense, setDense] = React.useState(true);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [ order, setOrder ] = useState<Order>('asc');
+  const [ orderBy, setOrderBy ] = useState<keyof Data>('name');
+  const [ selected, setSelected ] = useState<string[]>([]);
+  const [ page, setPage ] = useState(0);
+  const [ dense, setDense ] = useState(true);
+  const [ mockups, setMockups ] = utils.useStateWithLocalStorage('mockups', []);
+  const [ designFiles, setDesignFiles ] = utils.useStateWithLocalStorage('designFiles', []);
+  const [ rowsPerPage, setRowsPerPage ] = useState(10);
+  const [ rows, setRows ] = useState<Data[]>(loadData());
+  const [ emptyRows, setEmptyRows ] = useState(loadRowPerPage());
 
   function handleRequestSort(event: React.MouseEvent<unknown>, property: keyof Data) {
     const isDesc = orderBy === property && order === 'desc';
@@ -214,7 +219,7 @@ const Dashboard = () => {
     setOrderBy(property);
   }
 
-  function handleSelectAllClick(event: React.ChangeEvent<HTMLInputElement>) {
+  function selectAllMockups(event: React.ChangeEvent<HTMLInputElement>) {
     if (event.target.checked) {
       const newSelecteds = rows.map(n => n.name);
       setSelected(newSelecteds);
@@ -223,12 +228,12 @@ const Dashboard = () => {
     setSelected([]);
   }
 
-  function handleClick(event: React.MouseEvent<unknown>, name: string) {
-    const selectedIndex = selected.indexOf(name);
+  function selectMockup(event: React.MouseEvent<unknown>, sku: string) {
+    const selectedIndex = selected.indexOf(sku);
     let newSelected: string[] = [];
 
     if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
+      newSelected = newSelected.concat(selected, sku);
     }
     else if (selectedIndex === 0) {
       newSelected = newSelected.concat(selected.slice(1));
@@ -252,6 +257,7 @@ const Dashboard = () => {
 
   function handleChangeRowsPerPage(event: React.ChangeEvent<HTMLInputElement>) {
     setRowsPerPage(+event.target.value);
+    setEmptyRows(loadRowPerPage());
     setPage(0);
   }
 
@@ -259,9 +265,54 @@ const Dashboard = () => {
     setDense(event.target.checked);
   }
 
-  const isSelected = (name: string) => selected.indexOf(name) !== -1;
+  function loadData() {
+    return mockups.filter((mockup: any) => {
+      return !mockup.recycled;
+    }).map((mockup: any) => {
+      // return createData(mockup.data.item_name, mockup.data.main_image_url, mockup.state, mockup.data.item_sku, mockup.data.item_sku.substr(4));
+      const design = designFiles.find((design: any) => {
+        return design.fileName === mockup.designName;
+      });
 
-  const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
+      return createData(mockup.data.item_name, design.imagePreviewUrl || demoImg, mockup.state, mockup.data.item_sku, mockup.data.item_sku.substr(4));
+    });
+  }
+
+  function loadRowPerPage() {
+    return rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
+  }
+
+  const recycleTheMockup = (event: React.MouseEvent, sku: string) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (confirm('Do you want to recycle this mockup "' + sku + '"?')) {
+      const newMockups = mockups.map((mockup: any) => {
+        if (mockup.data.item_sku === sku) {
+          mockup.recycled = true;
+        };
+        return mockup;
+      });
+
+      setMockups(newMockups);
+      setRows(loadData());
+    }
+  };
+
+  const exportToCsv = () => {
+    console.log('exportToCsv', selected);
+    const exportedMockups = selected.map(sku => {
+      return mockups.find((mockup: any) => {
+        return mockup.data.item_sku === sku;
+      });
+    });
+
+    exportedMockups.map(exported => {
+      console.log(exported);
+    });
+  };
+
+  const isSelected = (name: string) => selected.indexOf(name) !== -1;
 
   return (
     <Layout>
@@ -275,7 +326,8 @@ const Dashboard = () => {
             <DeleteIcon className={classes.rightIcon} />
             Recycle
           </Button>
-          <Button size="medium" variant="contained" color="primary" className={clsx(classes.button, classes.green)} onClick={() => {}}>
+          <Button size="medium" variant="contained" color="primary" className={clsx(classes.button, classes.green)}
+            onClick={() => {exportToCsv()}}>
             <GetApp className={classes.rightIcon} />
             Export
           </Button>
@@ -293,7 +345,7 @@ const Dashboard = () => {
                 numSelected={selected.length}
                 order={order}
                 orderBy={orderBy}
-                onSelectAllClick={handleSelectAllClick}
+                onSelectAllClick={selectAllMockups}
                 onRequestSort={handleRequestSort}
                 rowCount={rows.length}
                 headRows={headRows}
@@ -302,46 +354,47 @@ const Dashboard = () => {
                 {stableSort(rows, getSorting(order, orderBy))
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row, index) => {
-                    const isItemSelected = isSelected(row.name.toString());
+                    const isItemSelected = isSelected(row.sku.toString());
                     const labelId = `dashboard-table-checkbox-${index}`;
+                    const itemkey = `${row.name}-${index}`;
 
                     return (
                       <TableRow
                         hover
-                        onClick={event => handleClick(event, row.name.toString())}
+                        onClick={event => selectMockup(event, row.sku.toString())}
                         role="checkbox"
                         aria-checked={isItemSelected}
                         tabIndex={-1}
-                        key={row.name}
+                        key={itemkey}
                         selected={isItemSelected}
                       >
-                        <TableCell padding="checkbox" component="th">
+                        <TableCell padding="checkbox">
                           <Checkbox checked={isItemSelected} inputProps={{ 'aria-labelledby': labelId }} />
                         </TableCell>
-                        <TableCell component="th">
+                        <TableCell>
                           {/* <Chip label={row.status} color="primary" className={classes.chip} /> */}
                           <Typography id="productStatus" color={"primary"}>{row.status}</Typography>
                         </TableCell>
                         <TableCell>
                           <img src={row.image.toString()} alt={row.name.toString()} className={classes.rowImg} />
                         </TableCell>
-                        <TableCell component="th" id={labelId} scope="row" padding="none">
+                        <TableCell id={labelId} scope="row" padding="none">
                           {row.name}
                         </TableCell>
-                        <TableCell component="th">
+                        <TableCell>
                           {row.sku}
                         </TableCell>
-                        <TableCell component="th">
+                        <TableCell>
                           {row.createdAt}
                         </TableCell>
-                        <TableCell align="right" component="th" id="actionGroups">
+                        <TableCell align="right" id="actionGroups">
                           <IconButton size="small" className={classes.rightIcon} onClick={() => {}} >
                             <EditIcon color="primary"/>
                           </IconButton>
                           <IconButton size="small" className={classes.rightIcon}>
                             <SaveIcon color="primary" />
                           </IconButton>
-                          <IconButton size="small" className={classes.rightIcon}>
+                          <IconButton size="small" className={classes.rightIcon} onClick={(e) => {recycleTheMockup(e, row.sku.toString())}}>
                             <DeleteIcon color="secondary" />
                           </IconButton>
                           <IconButton size="small" className={classes.rightIcon}>
@@ -351,11 +404,11 @@ const Dashboard = () => {
                       </TableRow>
                     );
                   })}
-                {emptyRows > 0 && (
+                {/* {emptyRows > 0 && (
                   <TableRow style={{ height: 49 * emptyRows }}>
-                    <TableCell colSpan={6} />
+                    <TableCell colSpan={7} />
                   </TableRow>
-                )}
+                )} */}
               </TableBody>
             </Table>
           </div>
