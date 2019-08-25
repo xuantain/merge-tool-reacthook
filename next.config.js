@@ -1,13 +1,12 @@
-const dev = process.env.NODE_ENV !== 'production';
+const withTypescript = require('@zeit/next-typescript');
+const withImages = require('next-images');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const path = require('path');
 
+const dev = process.env.NODE_ENV !== 'production';
 let config = {};
 
 if (dev) {
-  const withTypescript = require('@zeit/next-typescript');
-  const withImages = require('next-images');
-  const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-
   config = withImages(
     withTypescript({
       webpack(config, options) {
