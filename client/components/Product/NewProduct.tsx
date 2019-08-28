@@ -20,6 +20,7 @@ import StepAddProperties from './StepAddProperties';
 // Colors
 import lightGreen from '@material-ui/core/colors/lightGreen';
 
+import services from '../../services';
 import utils from '../../utils';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -117,9 +118,10 @@ const NewProductPage = () => {
     for (const designName in currentMockups) {
       if (currentMockups.hasOwnProperty(designName)) {
 
-        const patterns = currentMockups[designName];
+        const design = currentMockups[designName];
+        console.log('currentMockups', currentMockups);
 
-        patterns.map((patternName: string) => {
+        design.patterns.map((patternName: string) => {
           mergeDesignToPattern(designName, patternName);
         });
       }
@@ -149,9 +151,68 @@ const NewProductPage = () => {
 
       // const canvas = createCanvas(1000, 1000, 'pdf');
       // const img = new Image();
-      saveAs(b64, designName + patternName);
+      // saveAs(b64, designName + patternName);
       // document.querySelector('#demoImg').src = b64;
+
+      const fileName = designName.replace('.png', '-') + patternName.replace('.png', '-') + Date.now() + '.png' ;
+      uploadMockupToDropbox(fileName, b64);
     });
+  }
+
+  function uploadMockupToDropbox (fileName: string, b64: any) {
+    const i = b64.indexOf('base64,');
+    const buffer = Buffer.from(b64.slice(i + 7), 'base64');
+
+    services.dropbox.filesUpload({path: '/mockups/' + fileName, contents: buffer})
+      .then(function (newFileInfo) {
+        console.log(newFileInfo, newFileInfo.sharing_info);
+        // https://www.dropbox.com/sh/7jyd3yzxfghzmye/AAClDv4NEMP9IinbLKl1oQ_Va/design-text-1pattern-TShirt-black.png?dl=0
+
+        const settings = {
+          "requested_visibility": "public",
+          "audience": "public",
+          "access": "viewer"
+        };
+
+        services.dropbox.sharingCreateSharedLinkWithSettings({path: newFileInfo.path_display, settings: settings})
+          .then(function (sharedInfo) {
+            console.log('sharedInfo', sharedInfo);
+            //   {
+            //     ".tag": "file",
+            //     "url": "https://www.dropbox.com/s/2sn712vy1ovegw8/Prime_Numbers.txt?dl=0",
+            //     "name": "Prime_Numbers.txt",
+            //     "link_permissions": {
+            //         "can_revoke": false,
+            //         "resolved_visibility": {
+            //             ".tag": "public"
+            //         },
+            //         "revoke_failure_reason": {
+            //             ".tag": "owner_only"
+            //         }
+            //     },
+            //     "client_modified": "2015-05-12T15:50:38Z",
+            //     "server_modified": "2015-05-12T15:50:38Z",
+            //     "rev": "a1c10ce0dd78",
+            //     "size": 7212,
+            //     "id": "id:a4ayc_80_OEAAAAAAAAAXw",
+            //     "path_lower": "/homework/math/prime_numbers.txt",
+            //     "team_member_info": {
+            //         "team_info": {
+            //             "id": "dbtid:AAFdgehTzw7WlXhZJsbGCLePe8RvQGYDr-I",
+            //             "name": "Acme, Inc."
+            //         },
+            //         "display_name": "Roger Rabbit",
+            //         "member_id": "dbmid:abcd1234"
+            //     }
+            // }
+          })
+          .catch(function (error) {
+            console.error('dropbox sharingCreateSharedLinkWithSettings', error);
+          });
+      })
+      .catch(function (error) {
+        console.error('dropbox filesUpload', error);
+      });
   }
 
   return (
