@@ -68,7 +68,7 @@ const NewProductPage = () => {
   const [ currentMockups, setCurrentMockups ] = useState({});
 
   // getModalStyle is not a pure function, we roll the style only on the first render
-  const [activeStep, setActiveStep] = useState(2);
+  const [activeStep, setActiveStep] = useState(0);
   const steps = ['Select Designs', 'Select Patterns', 'Add Properties'];
 
   function handleNext() {

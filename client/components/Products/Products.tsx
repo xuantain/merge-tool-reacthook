@@ -1,22 +1,26 @@
-import _ from 'lodash';
+import React from 'react';
 import Head from 'next/head';
 import { useDispatch, useSelector } from 'react-redux';
-import GridList from '@material-ui/core/GridList';
-import GridListTile from '@material-ui/core/GridListTile';
-import GridListTileBar from '@material-ui/core/GridListTileBar';
-import IconButton from '@material-ui/core/IconButton';
 import { makeStyles, Theme, useTheme } from '@material-ui/core/styles';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
-import React from 'react';
-import InfoIcon from '@material-ui/icons/Info';
+import _ from 'lodash';
+
+import { ProductSortKeys } from '../../models';
 import Layout from '../Layout/Layout';
 import LoadMore from './LoadMore';
 import Sort from './Sort';
 import Search from './Search';
-import { ProductSortKeys } from '../../models';
-import utilities from '../../utils';
 import { ProductsState } from '../../stores/products.slice';
+
+import GridList from '@material-ui/core/GridList';
+import GridListTile from '@material-ui/core/GridListTile';
+import GridListTileBar from '@material-ui/core/GridListTileBar';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+import IconButton from '@material-ui/core/IconButton';
+import InfoIcon from '@material-ui/icons/Info';
+
+import utilities from '../../utils';
+
 
 interface Props {
   query: {
