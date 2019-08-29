@@ -46,7 +46,8 @@
     "react-spring": "^8.0.27",
     "react-use": "^10.5.0",
     "redux-starter-kit": "^0.5.1",
-    "styled-jsx": "^3.2.1"
+    "styled-jsx": "^3.2.1",
+    "xlsx": "^0.15.1"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^1.2.0",

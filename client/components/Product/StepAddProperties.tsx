@@ -94,16 +94,16 @@ const getDefaultMockupInfos = (designName: string): AMZ_Shirt_Strict => {
     item_name: designName,
     item_type: 'music-fan-t-shirts',
     outer_material_type1: 'Cotton',
-    color_name: 'Blue',
-    color_map: 'Blue',
+    color_name: 'Blue/Red',
+    color_map: 'Blue/Red',
     department_name: 'womens',
-    size_name: 'S/M/L/XXL',
-    size_map: 'Small/Medium/Large/XX-Large',
+    size_name: 'S/M/L/XL',
+    size_map: 'Small/Medium/Large/X-Large',
     is_adult_product: 'False',
     standard_price: 19.99,
     quantity: 999,
-    main_image_url: 'dropbox image url',
-    other_image_url1: 'other dropbox image url',
+    main_image_url: null,
+    other_image_url1: null,
     parent_child: 'parent',
     parent_sku: null,
     relationship_type: 'Variation',
@@ -134,28 +134,28 @@ const FormFields = (props: any) => {
   const theme = useTheme();
   const classes = useStyles(theme);
   const { data } = props;
-  const [ amzsize, setAmzsize ] = useState<string[]>([]);
-  const [ amzsizename, setAmzsizename ] = useState<string[]>([]);
-  const [ amzcolormap, setAmzcolormap ] = useState<string[]>([]);
-  const [ amzcolorname, setAmzcolorname ] = useState<string[]>([]);
+  const [ amzsize, setAmzsize ] = useState<string[]>(data.size_map.split('/'));
+  const [ amzsizename, setAmzsizename ] = useState<string[]>(data.size_name.split('/'));
+  const [ amzcolormap, setAmzcolormap ] = useState<string[]>(data.color_map.split('/'));
+  const [ amzcolorname, setAmzcolorname ] = useState<string[]>(data.color_name.split('/'));
 
   const changeSize = (event: React.ChangeEvent<{ value: string[] }>) => {
-    data.size = (event.target.value as string[]).join(',');
+    data.size = (event.target.value as string[]).join('/');
     setAmzsize(event.target.value as string[]);
   };
 
   const changeSizeName = (event: React.ChangeEvent<{ value: string[] }>) => {
-    data.size_name = (event.target.value as string[]).join(',');
+    data.size_name = (event.target.value as string[]).join('/');
     setAmzsizename(event.target.value as string[]);
   };
 
   const changeColorMap = (event: React.ChangeEvent<{ value: string[] }>) => {
-    data.color_map = (event.target.value as string[]).join(',');
+    data.color_map = (event.target.value as string[]).join('/');
     setAmzcolormap(event.target.value as string[]);
   };
 
   const changeColorName = (event: React.ChangeEvent<{ value: string[] }>) => {
-    data.color_name = (event.target.value as string[]).join(',');
+    data.color_name = (event.target.value as string[]).join('/');
     setAmzcolorname(event.target.value as string[]);
   };
 

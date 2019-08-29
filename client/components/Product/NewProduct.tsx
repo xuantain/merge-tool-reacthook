@@ -5,6 +5,7 @@ import Button from '@material-ui/core/Button';
 
 import mergeImages from 'merge-images';
 import { saveAs } from 'file-saver';
+import XLSX from 'xlsx';
 
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
@@ -20,8 +21,20 @@ import StepAddProperties from './StepAddProperties';
 // Colors
 import lightGreen from '@material-ui/core/colors/lightGreen';
 
+// Models
+import { AMZ_Shirt_Strict, AMZ_DEFAULT_ROW, AMZ_FIELD_ORDER } from "../../models/amz-shirt.strict.model";
+
 import services from '../../services';
 import utils from '../../utils';
+
+// Rough implementation. Untested.
+function timeout(ms, promise) {
+  return new Promise(function(resolve, reject) {
+    setTimeout(function() {
+      promise.then(resolve, reject);
+    }, ms);
+  })
+}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -115,21 +128,116 @@ const NewProductPage = () => {
   }
 
   function generateMockups () {
+
+    // var demo = {
+    //   cols: [{ name: 'A', key: 0 }, { name: 'B', key: 1 }, { name: 'C', key: 2 }],
+    //   data: [
+    //     [ 'TemplateType=fptcustom', 'Version=2019.0519', 'TemplateSignature=U0hJUlQ=', 'The top 3 rows are for Amazon.com use only. Do not modify or delete the top 3 rows.'],
+    //     [ 'Product Type', 'Seller SKU', 'Brand Name', 'Product Name' ],
+    //     [ 'feed_product_type', 'item_sku', 'brand_name', 'item_name' ],
+    //     [ 'shirt', 'DILO20052019001P', 'Dilostyle', 'I don\'t give a Hufflefuck tshirt' ]
+    //   ]
+    // };
+
+    let exportedData = [ AMZ_DEFAULT_ROW ];
+
+    const titles = AMZ_FIELD_ORDER.map(info => {
+      return info[1];
+    });
+
+    const keys = AMZ_FIELD_ORDER.map(info => {
+      return info[0];
+    });
+
+    exportedData.push(titles);
+    exportedData.push(keys);
+
+    let promises = [];
+
     for (const designName in currentMockups) {
       if (currentMockups.hasOwnProperty(designName)) {
 
         const design = currentMockups[designName];
-        console.log('currentMockups', currentMockups);
+        // console.log('currentMockups', currentMockups);
 
-        design.patterns.map((patternName: string) => {
-          mergeDesignToPattern(designName, patternName);
+        design.patterns.map((patternName: string, index: number) => {
+
+          const colors = design.data.color_name.split('/');
+          const sizes = design.data.size_name.split('/');
+          const colorMaps = design.data.color_map.split('/');
+          const sizeMaps = design.data.size_map.split('/');
+
+          let mugParent = {} as AMZ_Shirt_Strict;
+          mugParent.feed_product_type = design.data.feed_product_type;
+          mugParent.item_sku = design.data.item_sku;
+          mugParent.brand_name = design.data.brand_name;
+          mugParent.item_name = design.data.item_name;
+          mugParent.department_name = design.data.department_name;
+          mugParent.parent_child = 'parent';
+          mugParent.variation_theme = design.data.variation_theme;
+
+          // Add the Mug parent
+          const parentRowData = keys.map(key => {
+            return mugParent[key];
+          });
+
+          exportedData.push(parentRowData);
+
+          let count = 0;
+
+          // NOTE: Generate Mug child
+          colors.map((color, cidx) => {
+            sizes.map((size, sidx) => {
+
+              count++;
+
+              let mugChild = Object.assign({}, design.data);
+
+              mugChild.parent_sku = mugParent.item_sku;
+              mugChild.item_sku = mugParent.item_sku + '-' + count;
+              mugChild.parent_child = 'child';
+              mugChild.color_name = color;
+              mugChild.color_map = colorMaps[cidx];
+              mugChild.size_name = size;
+              mugChild.size_map = sizeMaps[sidx];
+
+              const childRowData = keys.map(key => {
+                return mugChild[key];
+              });
+
+              // NOTE: Merge design with color to pattern and then upload to Dropbox to get the public link.
+              promises.push(timeout((count - 1) * 3000, mergeDesignToPattern(designName, patternName, mugChild)));
+
+              exportedData.push(childRowData);
+            });
+          });
         });
       }
     }
+
+    Promise.all(promises).then(res => {
+      console.log('Promise.all', res);
+
+      res.map(info => {
+        exportedData.map(row => {
+          if (row[1] === info.sku) {
+            row[14] = info.url;
+          }
+        })
+      });
+
+      /* convert from array of arrays to workbook */
+      const worksheet = XLSX.utils.aoa_to_sheet(exportedData);
+      const new_workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(new_workbook, worksheet, 'amz-shirts');
+
+      const exportFileName = 'amz-shirts-' + Date.now() + '.xlsx';
+      XLSX.writeFile(new_workbook, exportFileName, { type:'base64', bookType: 'xlsx' });
+    });
   }
 
-  function mergeDesignToPattern (designName: string, patternName: string) {
-    console.log('mergeDesignToPattern', designName, patternName);
+  function mergeDesignToPattern (designName: string, patternName: string, mugChild: any) {
+    // console.log('mergeDesignToPattern', designName, patternName);
 
     const designIdx = designFiles.findIndex((design: any) => {
       return design.fileName === designName;
@@ -141,7 +249,7 @@ const NewProductPage = () => {
     });
     const patternSrc = patternFiles[patternIdx].imagePreviewUrl;
 
-    mergeImages([
+    return mergeImages([
       { src: patternSrc },
       { src: designSrc, opacity: 0.3 }
     ])
@@ -155,17 +263,17 @@ const NewProductPage = () => {
       // document.querySelector('#demoImg').src = b64;
 
       const fileName = designName.replace('.png', '-') + patternName.replace('.png', '-') + Date.now() + '.png' ;
-      uploadMockupToDropbox(fileName, b64);
+      return uploadMockupToDropbox(fileName, b64, mugChild);
     });
   }
 
-  function uploadMockupToDropbox (fileName: string, b64: any) {
+  function uploadMockupToDropbox (fileName: string, b64: any, mugChild: any) {
     const i = b64.indexOf('base64,');
     const buffer = Buffer.from(b64.slice(i + 7), 'base64');
 
-    services.dropbox.filesUpload({path: '/mockups/' + fileName, contents: buffer})
+    return services.dropbox.filesUpload({path: '/mockups/' + fileName, contents: buffer})
       .then(function (newFileInfo) {
-        console.log(newFileInfo, newFileInfo.sharing_info);
+        // console.log(newFileInfo, newFileInfo.sharing_info);
         // https://www.dropbox.com/sh/7jyd3yzxfghzmye/AAClDv4NEMP9IinbLKl1oQ_Va/design-text-1pattern-TShirt-black.png?dl=0
 
         const settings = {
@@ -174,9 +282,12 @@ const NewProductPage = () => {
           "access": "viewer"
         };
 
-        services.dropbox.sharingCreateSharedLinkWithSettings({path: newFileInfo.path_display, settings: settings})
+        return services.dropbox.sharingCreateSharedLinkWithSettings({path: newFileInfo.path_display, settings: settings})
           .then(function (sharedInfo) {
-            console.log('sharedInfo', sharedInfo);
+            // console.log('sharedInfo', sharedInfo.url);
+            mugChild.main_image_url = sharedInfo.url;
+
+            return { sku: mugChild.item_sku, url: sharedInfo.url };
             //   {
             //     ".tag": "file",
             //     "url": "https://www.dropbox.com/s/2sn712vy1ovegw8/Prime_Numbers.txt?dl=0",
@@ -207,11 +318,13 @@ const NewProductPage = () => {
             // }
           })
           .catch(function (error) {
-            console.error('dropbox sharingCreateSharedLinkWithSettings', error);
+            // console.error('dropbox sharingCreateSharedLinkWithSettings', error);
+            return { sku: mugChild.item_sku, url: 'cannot get shared link "' + fileName + '"' };
           });
       })
       .catch(function (error) {
-        console.error('dropbox filesUpload', error);
+        // console.error('dropbox filesUpload', error);
+        return { sku: mugChild.item_sku, url: 'cannot upload image "' + fileName + '"' };
       });
   }
 
