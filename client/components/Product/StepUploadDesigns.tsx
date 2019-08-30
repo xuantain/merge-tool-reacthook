@@ -12,8 +12,43 @@ import { useSpring, animated } from 'react-spring';
 
 import services from '../../services';
 
+// Models
+import { DESIGN } from "../../models/amz-shirt.strict.model";
+
 import camera512Icon from '../../../assets/img/camera-512.png';
 import dropboxIcon from '../../../assets/img/dropbox-icon.png';
+
+
+interface FadeProps {
+  children: React.ReactElement;
+  in: boolean;
+  onEnter?: () => {};
+  onExited?: () => {};
+}
+
+const Fade = React.forwardRef<HTMLDivElement, FadeProps>(function Fade(props, ref) {
+  const { in: open, children, onEnter, onExited, ...other } = props;
+  const style = useSpring({
+    from: { opacity: 0 },
+    to: { opacity: open ? 1 : 0 },
+    onStart: () => {
+      if (open && onEnter) {
+        onEnter();
+      }
+    },
+    onRest: () => {
+      if (!open && onExited) {
+        onExited();
+      }
+    },
+  });
+
+  return (
+    <animated.div ref={ref} style={style} {...other}>
+      {children}
+    </animated.div>
+  );
+});
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -53,42 +88,11 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-interface FadeProps {
-  children: React.ReactElement;
-  in: boolean;
-  onEnter?: () => {};
-  onExited?: () => {};
-}
-
-const Fade = React.forwardRef<HTMLDivElement, FadeProps>(function Fade(props, ref) {
-  const { in: open, children, onEnter, onExited, ...other } = props;
-  const style = useSpring({
-    from: { opacity: 0 },
-    to: { opacity: open ? 1 : 0 },
-    onStart: () => {
-      if (open && onEnter) {
-        onEnter();
-      }
-    },
-    onRest: () => {
-      if (!open && onExited) {
-        onExited();
-      }
-    },
-  });
-
-  return (
-    <animated.div ref={ref} style={style} {...other}>
-      {children}
-    </animated.div>
-  );
-});
-
 const StepUploadDesign = (props: any) => {
   const theme = useTheme();
   const classes = useStyles(theme);
   const inputRef = useRef(null);
-  const { designFiles, setDesignFiles } = props;
+  const { designs, setDesigns } = props;
   const [ isOpenDropbox, setIsOpenDropbox] = React.useState(false);
   const [ designsOnDropbox, setDesignsOnDropbox ] = React.useState<any[]>([]);
 
@@ -110,13 +114,13 @@ const StepUploadDesign = (props: any) => {
       }).map(entry => {
         return {
           path: entry['path_display'],
-          size: 'w1024h768',
-          format: 'png',
+          size: {'.tag': 'w1024h768'} as DropboxTypes.files.ThumbnailSizeW1024h768,
+          format: {'.tag': 'png'} as DropboxTypes.files.ThumbnailFormatPng,
         };
       });
 
       services.dropbox.filesGetThumbnailBatch({
-        entries: requestedEntries
+        entries: requestedEntries as DropboxTypes.files.ThumbnailArg[]
       }).then(response => {
         console.log('designs/*', response);
         setDesignsOnDropbox(response.entries);
@@ -140,23 +144,24 @@ const StepUploadDesign = (props: any) => {
       let reader = new FileReader();
 
       reader.onloadend = () => {
-        var wasAdded = designFiles.findIndex(function (design: any) {
-          return design.fileName === file.name && design.lastModified === file.lastModified;
+        var wasAdded = designs.findIndex(function (design: DESIGN) {
+          return design.name === file.name && design.lastModified === file.lastModified;
         });
 
         if (wasAdded > -1) {
           return;
         }
 
-        let newItem = {
-          file: file,
-          fileName: file.name,
-          fileType: file.type,
+        let newDesign = {
+          id: designs.length + 1,
+          src: reader.result,
+          name: file.name,
+          type: file.type,
           lastModified: file.lastModified,
-          imagePreviewUrl: reader.result
-        };
+          addedAt: Date.now(),
+        } as DESIGN;
 
-        setDesignFiles([...designFiles, newItem]);
+        setDesigns([...designs, newDesign]);
       }
 
       reader.readAsDataURL(file)
@@ -166,14 +171,14 @@ const StepUploadDesign = (props: any) => {
   return (
     <>
       {
-        designFiles && designFiles.length > 0 ? designFiles.map((item: any, index: number) => {
+        designs && designs.length > 0 ? designs.map((design: DESIGN, index: number) => {
           return (
             <Card className={classes.card} key={'design-' + index}>
               <CardActionArea>
                 <CardMedia
                   className={classes.media}
-                  image={item.imagePreviewUrl}
-                  title={item.fileName}
+                  image={design.src.toString()}
+                  title={design.name}
                 />
               </CardActionArea>
             </Card>

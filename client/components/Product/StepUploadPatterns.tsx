@@ -12,8 +12,12 @@ import { useSpring, animated } from 'react-spring';
 
 import services from '../../services';
 
+// Models
+import { PATTERN } from "../../models/amz-shirt.strict.model";
+
 import camera512Icon from '../../../assets/img/camera-512.png';
 import dropboxIcon from '../../../assets/img/dropbox-icon.png';
+
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -88,7 +92,7 @@ const StepUploadPatterns = (props: any) => {
   const theme = useTheme();
   const classes = useStyles(theme);
   const inputRef = useRef(null);
-  const { patternFiles, setPatternFiles } = props;
+  const { patterns, setPatterns } = props;
   const [ isOpenDropbox, setIsOpenDropbox] = React.useState(false);
   const [ patternsOnDropbox, setPatternsOnDropbox ] = React.useState<any[]>([]);
 
@@ -110,13 +114,13 @@ const StepUploadPatterns = (props: any) => {
       }).map(entry => {
         return {
           path: entry['path_display'],
-          size: 'w1024h768',
-          format: 'png',
+          size: {'.tag': 'w1024h768'} as DropboxTypes.files.ThumbnailSizeW1024h768,
+          format: {'.tag': 'png'} as DropboxTypes.files.ThumbnailFormatPng,
         };
       });
 
       services.dropbox.filesGetThumbnailBatch({
-        entries: requestedEntries
+        entries: requestedEntries as DropboxTypes.files.ThumbnailArg[]
       }).then(response => {
         console.log('patterns/*', response);
         setPatternsOnDropbox(response.entries);
@@ -124,7 +128,6 @@ const StepUploadPatterns = (props: any) => {
       });
     });
   };
-
 
   function choosePatternsFromLocal(e: React.MouseEvent) {
     e.preventDefault();
@@ -134,43 +137,48 @@ const StepUploadPatterns = (props: any) => {
   function onDrop(e: React.ChangeEvent<HTMLInputElement>) {
     e.preventDefault();
 
-    let reader = new FileReader();
-    let file = e.target.files[0];
+    let files = e.target.files as FileList;
 
-    reader.onloadend = () => {
-      var wasAdded = patternFiles.findIndex(function (pattern: any) {
-        return pattern.fileName === file.name && pattern.lastModified === file.lastModified;
-      });
+    Array.from(files).forEach((file: File) => {
 
-      if (wasAdded > -1) {
-        return;
+      let reader = new FileReader();
+
+      reader.onloadend = () => {
+        var wasAdded = patterns.findIndex(function (pattern: PATTERN) {
+          return pattern.name === file.name && pattern.lastModified === file.lastModified;
+        });
+
+        if (wasAdded > -1) {
+          return;
+        }
+
+        let newPattern = {
+          id: patterns.length + 1,
+          src: reader.result,
+          name: file.name,
+          type: file.type,
+          lastModified: file.lastModified,
+          addedAt: Date.now(),
+        } as PATTERN;
+
+        setPatterns([...patterns, newPattern]);
       }
 
-      let newItem = {
-        file: file,
-        fileName: file.name,
-        fileType: file.type,
-        lastModified: file.lastModified,
-        imagePreviewUrl: reader.result
-      };
-
-      setPatternFiles([...patternFiles, newItem]);
-    }
-
-    reader.readAsDataURL(file)
+      reader.readAsDataURL(file);
+    });
   };
 
   return (
     <>
       {
-        patternFiles && patternFiles.length > 0 ? patternFiles.map((item: any, index: number) => {
+        patterns && patterns.length > 0 ? patterns.map((pattern: PATTERN, index: number) => {
           return (
             <Card className={classes.card} key={'pattern-' + index}>
               <CardActionArea>
                 <CardMedia
                   className={classes.media}
-                  image={item.imagePreviewUrl}
-                  title={item.fileName}
+                  image={pattern.src.toString()}
+                  title={pattern.name}
                 />
               </CardActionArea>
             </Card>

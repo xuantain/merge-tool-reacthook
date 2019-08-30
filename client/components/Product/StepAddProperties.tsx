@@ -26,9 +26,20 @@ import Chip from '@material-ui/core/Chip';
 import lightGreen from '@material-ui/core/colors/lightGreen';
 
 // Models
-import { AMZ_Shirt_Strict } from "../../models/amz-shirt.strict.model";
+import { DESIGN, PATTERN, MUG, COLOR, SIZE, AMZ_APP_SHIRT } from "../../models/amz-shirt.strict.model";
 import { AMZ_COLOR, AMZ_APP_COLOR, AMZ_DEPARTMENT, AMZ_SIZE_MAP, AMZ_APP_SIZE_MAP } from "../../models/amz-product.model";
 
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -85,8 +96,7 @@ const getCurrentDateWithFormat = () => {
     ('0' + date.getMilliseconds()).slice(-2);
 };
 
-const getDefaultMockupInfos = (designName: string): AMZ_Shirt_Strict => {
-
+const getDefaultMockupInfos = (designName: string): AMZ_APP_SHIRT => {
   return {
     feed_product_type: 'shirt',
     item_sku: 'DLS-' + getCurrentDateWithFormat(),
@@ -117,17 +127,6 @@ const getDefaultMockupInfos = (designName: string): AMZ_Shirt_Strict => {
     fulfillment_latency: 6,
     merchant_shipping_group_name: 'Migrated Template AMZ',
   };
-};
-
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
 };
 
 const FormFields = (props: any) => {
@@ -400,7 +399,7 @@ const FormFields = (props: any) => {
             </Select>
           </FormControl>
         </Grid>
-        <Grid item xs={12} sm={6} lg={4}>
+        {/* <Grid item xs={12} sm={6} lg={4}>
           <FormControl fullWidth className={classes.textField}>
             <InputLabel htmlFor="select-multiple-chip">Size Map</InputLabel>
             <Select
@@ -428,7 +427,7 @@ const FormFields = (props: any) => {
               }
             </Select>
           </FormControl>
-        </Grid>
+        </Grid> */}
         <Grid item xs={12} sm={6} lg={4}>
           <TextField
             required
@@ -659,7 +658,7 @@ const PatternMockupList = (props: any) => {
         const idx = currentMockups[designName].patterns.indexOf(patternName);
         const newPatterns = currentMockups[designName] ? currentMockups[designName].patterns : [];
 
-        newPatterns.patterns.splice(idx, 1);
+        newPatterns.splice(idx, 1);
         currentMockups[designName].patterns = newPatterns;
 
         return currentMockups;

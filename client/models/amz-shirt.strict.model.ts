@@ -1,4 +1,4 @@
-export type AMZ_Shirt_Strict = {
+export type AMZ_APP_SHIRT = {
   feed_product_type?: string,
   item_sku?: string,
   brand_name?: string,
@@ -36,6 +36,49 @@ export type InputType = {
   type: '',
   dataType: 'string',
   defaulValue: null,
+}
+
+export type APP_TYPE = {
+  id: number,
+  name?: string,
+  addedAt?: number,
+  uploadedAt: number,
+  recycled?: boolean | false,
+  recycledAt: number,
+}
+
+export type APP_IMAGE = APP_TYPE & {
+  src?: string | ArrayBuffer | WindowBase64,
+  type?: string,
+  lastModified?: number,
+}
+
+export type DESIGN = APP_IMAGE & {
+}
+
+export type PATTERN = APP_IMAGE & {
+}
+
+export type COLOR = APP_TYPE & {
+  hex?: string,
+  amz_color_map?: string,
+}
+
+export type SIZE = {
+  appSize?: string,
+  amzSize?: string,
+}
+
+export type MUG = APP_TYPE & {
+  designId?: number,
+  designName?: string,
+  patterns?: {
+    patternId?: number,
+    patternName?: string,
+    colors?: COLOR[],
+    sizes?: SIZE[],
+    data?: AMZ_APP_SHIRT,
+  }[],
 }
 
 export const AMZ_DEFAULT_ROW = [

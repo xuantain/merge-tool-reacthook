@@ -9,3 +9,4 @@ themes
 node_modules
 npm-debug.log
 .dropbox.config.ts
+package-lock.json
