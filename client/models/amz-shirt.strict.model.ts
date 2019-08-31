@@ -27,7 +27,7 @@ export type AMZ_APP_SHIRT = {
   generic_keywords?: string,
   fulfillment_latency?: number,
   merchant_shipping_group_name?: string,
-}
+};
 
 // NOTE: InputType
 // dataType: string/number
@@ -36,50 +36,66 @@ export type InputType = {
   type: '',
   dataType: 'string',
   defaulValue: null,
-}
+};
 
 export type APP_TYPE = {
   id: number,
   name?: string,
   addedAt?: number,
   uploadedAt: number,
-  recycled?: boolean | false,
   recycledAt: number,
-}
+};
 
 export type APP_IMAGE = APP_TYPE & {
   src?: string | ArrayBuffer | WindowBase64,
   type?: string,
   lastModified?: number,
-}
+};
 
 export type DESIGN = APP_IMAGE & {
-}
+};
 
 export type PATTERN = APP_IMAGE & {
-}
+};
+
+export type MOCKUP = APP_TYPE & {
+  mugId?: number,
+  mugName?: string,
+  designId?: number,
+  designName?: string,
+  patternId?: number,
+  patternName?: string,
+  sku?: string,
+  color?: string,
+  link: string,
+  sharedLink: string,
+  b64: string | ArrayBuffer | WindowBase64,
+};
 
 export type COLOR = APP_TYPE & {
   hex?: string,
-  amz_color_map?: string,
-}
+  amzColor?: string,
+};
 
 export type SIZE = {
   appSize?: string,
   amzSize?: string,
-}
+};
+
+export type MUG_PATTERN = {
+  id?: number,
+  name?: string,
+  colors?: COLOR[],
+  sizes?: SIZE[],
+  data?: AMZ_APP_SHIRT,
+  exportedAt: number,
+};
 
 export type MUG = APP_TYPE & {
   designId?: number,
   designName?: string,
-  patterns?: {
-    patternId?: number,
-    patternName?: string,
-    colors?: COLOR[],
-    sizes?: SIZE[],
-    data?: AMZ_APP_SHIRT,
-  }[],
-}
+  patterns?: MUG_PATTERN[],
+};
 
 export const AMZ_DEFAULT_ROW = [
   'TemplateType=fptcustom',
