@@ -92,10 +92,9 @@ const StepUploadPatterns = (props: any) => {
   const theme = useTheme();
   const classes = useStyles(theme);
   const inputRef = useRef(null);
-  const { patterns, setPatterns } = props;
+  const { patterns, setPatterns, currentPatterns, setcurrentPatterns } = props;
   const [ isOpenDropbox, setIsOpenDropbox] = React.useState(false);
   const [ patternsOnDropbox, setPatternsOnDropbox ] = React.useState<any[]>([]);
-
 
   function closeDropboxPopper() {
     setIsOpenDropbox(false);
@@ -137,31 +136,35 @@ const StepUploadPatterns = (props: any) => {
   function onDrop(e: React.ChangeEvent<HTMLInputElement>) {
     e.preventDefault();
 
-    let files = e.target.files as FileList;
+    const files = e.target.files as FileList;
 
     Array.from(files).forEach((file: File) => {
 
       let reader = new FileReader();
 
       reader.onloadend = () => {
-        var wasAdded = patterns.findIndex(function (pattern: PATTERN) {
-          return pattern.name === file.name && pattern.lastModified === file.lastModified;
-        });
+        const wasAdded = patterns[file.name] && (patterns[file.name].name === file.name) && (patterns[file.name].lastModified === file.lastModified);
 
-        if (wasAdded > -1) {
-          return;
+        let newPattern: PATTERN;
+
+        if (wasAdded) {
+          newPattern = patterns[file.name];
+        } else {
+          newPattern = {
+            id: Object.keys(patterns).length + 1, // TODO: async so still not get id yet
+            src: reader.result,
+            name: file.name,
+            type: file.type,
+            lastModified: file.lastModified,
+            addedAt: Date.now(),
+          } as PATTERN;
+
+          setPatterns(patterns => {
+            return {...patterns, [file.name]: newPattern};
+          });
         }
 
-        let newPattern = {
-          id: patterns.length + 1,
-          src: reader.result,
-          name: file.name,
-          type: file.type,
-          lastModified: file.lastModified,
-          addedAt: Date.now(),
-        } as PATTERN;
-
-        setPatterns([...patterns, newPattern]);
+        setcurrentPatterns([...currentPatterns, newPattern]);
       }
 
       reader.readAsDataURL(file);
@@ -171,7 +174,7 @@ const StepUploadPatterns = (props: any) => {
   return (
     <>
       {
-        patterns && patterns.length > 0 ? patterns.map((pattern: PATTERN, index: number) => {
+        currentPatterns && currentPatterns.length > 0 ? currentPatterns.map((pattern: PATTERN, index: number) => {
           return (
             <Card className={classes.card} key={'pattern-' + index}>
               <CardActionArea>

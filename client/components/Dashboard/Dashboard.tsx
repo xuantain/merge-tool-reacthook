@@ -39,58 +39,39 @@ import cyan from '@material-ui/core/colors/cyan';
 
 import tShirt from '../../../assets/img/tshirt.webp';
 import utils from '../../utils';
+import XLSX from 'xlsx';
 
+// Models
+import { DESIGN, MOCKUP, MUG, MUG_PATTERN, COLOR, SIZE, AMZ_APP_SHIRT, AMZ_DEFAULT_ROW, AMZ_FIELD_ORDER } from "../../models/amz-shirt.strict.model";
 
-interface Data {
-  name: string;
-  image: string;
-  status: string;
-  sku: string;
-  createdAt: string;
-}
-
-interface HeadRow {
-  disablePadding: boolean;
-  id: keyof Data;
-  label: string;
-  numeric: boolean;
-}
-
-function createData(
-  name: string,
-  image: string,
-  status: string,
-  sku: string,
-  createdAt: string,
-): Data {
-  return { name, image, status, sku, createdAt };
-}
 
 // const demoImg = 'https://cdn.shopify.com/s/files/1/1312/0893/products/004.jpg?v=1491851162';
 const demoImg = tShirt;
 
+interface RowData {
+  sku: string;
+  designName: string;
+  patternName: string;
+  mockupImage: string;
+  status: string;
+  createdAt: string;
+  mugPattern: MUG_PATTERN,
+}
+
+interface HeadRow {
+  disablePadding: boolean;
+  id: keyof RowData;
+  label: string;
+  numeric: boolean;
+}
+
 const headRows: HeadRow[] = [
   { id: 'status', numeric: false, disablePadding: false, label: 'Status' },
-  { id: 'image', numeric: false, disablePadding: false, label: 'Image' },
-  { id: 'name', numeric: false, disablePadding: true, label: 'Name' },
+  { id: 'mockupImage', numeric: false, disablePadding: false, label: 'Image' },
+  { id: 'designName', numeric: false, disablePadding: true, label: 'Name' },
   { id: 'sku', numeric: false, disablePadding: false, label: 'SKU' },
   { id: 'createdAt', numeric: false, disablePadding: false, label: 'Created at' },
 ];
-
-// const rows = [
-//   createData('Shirt 1', demoImg, 'Synced', 'Tee-20190729-001', '2019-07-01 14h:15m:31s'),
-//   createData('Shirt 2', demoImg, 'Synced', 'Tee-20190729-002', '2019-07-01 10h:36m:21s'),
-//   createData('Shirt 3', demoImg, 'Synced', 'Tee-20190729-003', '2019-07-01 14h:45m:15s'),
-//   createData('Shirt 4', demoImg, 'Synced', 'Tee-20190729-004', '2019-07-02 13h:35m:01s'),
-//   createData('Shirt 5', demoImg, 'Synced', 'Tee-20190729-005', '2019-07-02 17h:25m:31s'),
-//   createData('Shirt 6', demoImg, 'Synced', 'Tee-20190729-006', '2019-07-02 11h:35m:33s'),
-//   createData('Shirt 7', demoImg, 'Synced', 'Tee-20190729-007', '2019-07-02 18h:25m:31s'),
-//   createData('Shirt 8', demoImg, 'Synced', 'Tee-20190729-008', '2019-07-02 11h:55m:22s'),
-//   createData('Shirt 9', demoImg, 'Synced', 'Tee-20190729-009', '2019-07-03 19h:25m:39s'),
-//   createData('Shirt 10', demoImg, 'Synced', 'Tee-20190729-010', '2019-07-03 10h:15m:45s'),
-//   createData('Shirt 11', demoImg, 'Synced', 'Tee-20190729-011', '2019-07-03 10h:15m:34s'),
-//   createData('Shirt 12', demoImg, 'Synced', 'Tee-20190729-012', '2019-07-03 11h:15m:55s'),
-// ];
 
 function desc<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -203,52 +184,54 @@ const Dashboard = () => {
   const theme = useTheme();
   const classes = useStyles(theme);
   const [ order, setOrder ] = useState<Order>('asc');
-  const [ orderBy, setOrderBy ] = useState<keyof Data>('name');
-  const [ selected, setSelected ] = useState<string[]>([]);
+  const [ orderBy, setOrderBy ] = useState<keyof RowData>('sku');
   const [ page, setPage ] = useState(0);
   const [ dense, setDense ] = useState(true);
-  const [ mockups, setMockups ] = utils.useStateWithLocalStorage('mockups', []);
-  const [ designFiles, setDesignFiles ] = utils.useStateWithLocalStorage('designFiles', []);
   const [ rowsPerPage, setRowsPerPage ] = useState(10);
-  const [ rows, setRows ] = useState<Data[]>(loadData());
+  const [ designs, setDesigns ] = utils.useStateWithLocalStorage('designs', {});
+  const [ mockups, setMockups ] = utils.useStateWithLocalStorage('mockups', []);
+  const [ mugs ] = utils.useStateWithLocalStorage('mugs', {});
+  const [ rows, setRows ] = useState<RowData[]>(loadData());
+  const [ selectedMugPatterns, setSelectedMugPatterns ] = useState<MUG_PATTERN[]>([]);
   const [ emptyRows, setEmptyRows ] = useState(loadRowPerPage());
 
-  function handleRequestSort(event: React.MouseEvent<unknown>, property: keyof Data) {
+  function handleRequestSort(event: React.MouseEvent<unknown>, property: keyof RowData) {
     const isDesc = orderBy === property && order === 'desc';
     setOrder(isDesc ? 'asc' : 'desc');
     setOrderBy(property);
   }
 
-  function selectAllMockups(event: React.ChangeEvent<HTMLInputElement>) {
+  function selectAllMugPatterns(event: React.ChangeEvent<HTMLInputElement>) {
     if (event.target.checked) {
-      const newSelecteds = rows.map(n => n.name);
-      setSelected(newSelecteds);
+      const newSelecteds = rows.map(row => { return row.mugPattern });
+      setSelectedMugPatterns(newSelecteds);
       return;
     }
-    setSelected([]);
+
+    setSelectedMugPatterns([]);
   }
 
-  function selectMockup(event: React.MouseEvent<unknown>, sku: string) {
-    const selectedIndex = selected.indexOf(sku);
-    let newSelected: string[] = [];
+  function selectMugPattern(event: React.MouseEvent<unknown>, mugPattern: MUG_PATTERN) {
+    const selectedIndex = selectedMugPatterns.indexOf(mugPattern);
+    let newSelected: MUG_PATTERN[] = [];
 
     if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, sku);
+      newSelected = newSelected.concat(selectedMugPatterns, mugPattern);
     }
     else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
+      newSelected = newSelected.concat(selectedMugPatterns.slice(1));
     }
-    else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
+    else if (selectedIndex === selectedMugPatterns.length - 1) {
+      newSelected = newSelected.concat(selectedMugPatterns.slice(0, -1));
     }
     else if (selectedIndex > 0) {
       newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1),
+        selectedMugPatterns.slice(0, selectedIndex),
+        selectedMugPatterns.slice(selectedIndex + 1),
       );
     }
 
-    setSelected(newSelected);
+    setSelectedMugPatterns(newSelected);
   }
 
   function handleChangePage(event: unknown, newPage: number) {
@@ -265,28 +248,60 @@ const Dashboard = () => {
     setDense(event.target.checked);
   }
 
-  function loadData() {
-    return mockups.filter((mockup: any) => {
-      return !mockup.recycled;
-    }).map((mockup: any) => {
-      // return createData(mockup.data.item_name, mockup.data.main_image_url, mockup.state, mockup.data.item_sku, mockup.data.item_sku.substr(4));
-      const design = designFiles.find((design: any) => {
-        return design.fileName === mockup.designName;
-      });
+  function createData(design: DESIGN, mugPattern: MUG_PATTERN, mockup: MOCKUP): RowData {
 
-      return createData(mockup.data.item_name, design.imagePreviewUrl || demoImg, mockup.state, mockup.data.item_sku, mockup.data.item_sku.substr(4));
-    });
+    let status = 'Pending';
+
+    if (mockup.uploadedAt !== null) {
+      status = 'Uploaded';
+    };
+
+    const createdAt = new Date(mockup.addedAt).toISOString();
+
+    const rowdata = {
+      sku: mugPattern.data.item_sku,
+      designName: design.name,
+      patternName: mugPattern.name,
+      mockupImage: mockup.sharedLink || design.src.toString(),
+      status: status,
+      createdAt: createdAt,
+      mugPattern: mugPattern,
+    };
+
+    return rowdata;
+  }
+
+  function loadData() {
+    let rowdata = [];
+
+    for (const mugId in mugs) {
+      const mug = mugs[mugId];
+
+      if (!mug.recycledAt) {
+        mug.patterns.map((mugPattern: MUG_PATTERN) => {
+          if (mugPattern.colors.length) {
+            const mockup: MOCKUP = mockups.find((mockup: MOCKUP) => {
+              return (mockup.patternId === mugPattern.id) && (mockup.designName === mug.designName)
+            });
+            const design: DESIGN = designs[mug.designName];
+            rowdata.push(createData(design, mugPattern, mockup));
+          }
+        });
+      }
+    }
+
+    return rowdata;
   }
 
   function loadRowPerPage() {
     return rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
   }
 
-  const recycleTheMockup = (event: React.MouseEvent, sku: string) => {
+  const recycleTheMugPattern = (event: React.MouseEvent, sku: string) => {
     event.preventDefault();
     event.stopPropagation();
 
-    if (confirm('Do you want to recycle this mockup "' + sku + '"?')) {
+    if (confirm('Do you want to recycle this mug-pattern "' + sku + '"?')) {
       const newMockups = mockups.map((mockup: any) => {
         if (mockup.data.item_sku === sku) {
           mockup.recycled = true;
@@ -299,20 +314,88 @@ const Dashboard = () => {
     }
   };
 
-  const exportToCsv = () => {
-    console.log('exportToCsv', selected);
-    const exportedMockups = selected.map(sku => {
-      return mockups.find((mockup: any) => {
-        return mockup.data.item_sku === sku;
+  function exportToExcel () {
+
+    // NOTE: Adding 3 first rows for AMZ
+    let exportedData = [ AMZ_DEFAULT_ROW ];
+
+    const titles = AMZ_FIELD_ORDER.map(info => {
+      return info[1];
+    });
+
+    const keys = AMZ_FIELD_ORDER.map(info => {
+      return info[0];
+    });
+
+    exportedData.push(titles);
+    exportedData.push(keys);
+
+    // NOTE: Generate row data
+    selectedMugPatterns.map((mugPattern: MUG_PATTERN) => {
+
+      mugPattern.exportedAt = Date.now();
+
+      let rowParent = {} as AMZ_APP_SHIRT;
+
+      rowParent.feed_product_type = mugPattern.data.feed_product_type;
+      rowParent.item_sku = mugPattern.data.item_sku;
+      rowParent.brand_name = mugPattern.data.brand_name;
+      rowParent.item_name = mugPattern.data.item_name;
+      rowParent.department_name = mugPattern.data.department_name;
+      rowParent.parent_child = 'parent';
+      rowParent.variation_theme = mugPattern.data.variation_theme;
+
+      // Add the Row parent
+      const parentRowData = keys.map(key => {
+        return rowParent[key];
+      });
+
+      exportedData.push(parentRowData);
+
+      let count = 0;
+
+      // NOTE: Generate Row child
+      mugPattern.colors.map((color: COLOR, cidx: number) => {
+
+        const mockup: MOCKUP = mockups.find((mockup: MOCKUP) => {
+          return mockup.patternName === mugPattern.name && mockup.color === color.name;
+        });
+        const sharedLink = mockup ? (mockup.sharedLink || mockup.b64 || 'async problem') : 'sharedLink';
+
+        mugPattern.sizes.map((size: SIZE, sidx: number) => {
+
+          count++;
+
+          let rowChild = Object.assign({}, mugPattern.data);
+
+          rowChild.parent_sku = rowParent.item_sku;
+          rowChild.item_sku = rowParent.item_sku + '-' + count;
+          rowChild.parent_child = 'child';
+          rowChild.color_name = color.name;
+          rowChild.color_map = color.amzColor;
+          rowChild.size_name = size.appSize;
+          rowChild.size_map = size.amzSize;
+          rowChild.main_image_url = sharedLink.toString();
+
+          const childRowData = keys.map(key => {
+            return rowChild[key];
+          });
+
+          exportedData.push(childRowData);
+        });
       });
     });
 
-    exportedMockups.map(exported => {
-      console.log(exported);
-    });
-  };
+    // NOTE: Convert from array of arrays to workbook
+    const worksheet = XLSX.utils.aoa_to_sheet(exportedData);
+    const new_workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(new_workbook, worksheet, 'amz-shirts');
 
-  const isSelected = (name: string) => selected.indexOf(name) !== -1;
+    const exportFileName = 'amz-shirts-' + Date.now() + '.xlsx';
+    XLSX.writeFile(new_workbook, exportFileName, { type:'base64', bookType: 'xlsx' });
+  }
+
+  const isSelected = (row: RowData) => selectedMugPatterns.findIndex(mugPattern => { return mugPattern.data.item_sku === row.sku}) !== -1;
 
   return (
     <Layout>
@@ -327,7 +410,7 @@ const Dashboard = () => {
             Recycle
           </Button>
           <Button size="medium" variant="contained" color="primary" className={clsx(classes.button, classes.green)}
-            onClick={() => {exportToCsv()}}>
+            onClick={() => {exportToExcel()}}>
             <GetApp className={classes.rightIcon} />
             Export
           </Button>
@@ -338,14 +421,14 @@ const Dashboard = () => {
           </Button>
         </Box>
         <Paper className={classes.paper}>
-          <DashboardTableToolbar numSelected={selected.length} />
+          <DashboardTableToolbar numSelected={selectedMugPatterns.length} />
           <div className={classes.tableWrapper}>
             <Table className={classes.table} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
               <DashboardTableHead
-                numSelected={selected.length}
+                numSelected={selectedMugPatterns.length}
                 order={order}
                 orderBy={orderBy}
-                onSelectAllClick={selectAllMockups}
+                onSelectAllClick={selectAllMugPatterns}
                 onRequestSort={handleRequestSort}
                 rowCount={rows.length}
                 headRows={headRows}
@@ -353,15 +436,15 @@ const Dashboard = () => {
               <TableBody>
                 {stableSort(rows, getSorting(order, orderBy))
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row, index) => {
-                    const isItemSelected = isSelected(row.sku.toString());
+                  .map((row: RowData, index: number) => {
+                    const isItemSelected = isSelected(row);
                     const labelId = `dashboard-table-checkbox-${index}`;
-                    const itemkey = `${row.name}-${index}`;
+                    const itemkey = `${row.designName}-${index}`;
 
                     return (
                       <TableRow
                         hover
-                        onClick={event => selectMockup(event, row.sku.toString())}
+                        onClick={event => selectMugPattern(event, row.mugPattern)}
                         role="checkbox"
                         aria-checked={isItemSelected}
                         tabIndex={-1}
@@ -372,14 +455,18 @@ const Dashboard = () => {
                           <Checkbox checked={isItemSelected} inputProps={{ 'aria-labelledby': labelId }} />
                         </TableCell>
                         <TableCell>
-                          {/* <Chip label={row.status} color="primary" className={classes.chip} /> */}
-                          <Typography id="productStatus" color={"primary"}>{row.status}</Typography>
+                          {
+                            (row.status === 'Uploaded') ?
+                              <Chip label={row.status} color="primary" className={classes.chip} /> :
+                              <Chip label={row.status} color="secondary" className={classes.chip} />
+                          }
+                          {/* <Typography id="productStatus" color={"primary"}>{row.status}</Typography> */}
                         </TableCell>
                         <TableCell>
-                          <img src={row.image.toString()} alt={row.name.toString()} className={classes.rowImg} />
+                          <img src={row.mockupImage} alt={row.designName + row.patternName} className={classes.rowImg} />
                         </TableCell>
                         <TableCell id={labelId} scope="row" padding="none">
-                          {row.name}
+                          {row.designName}
                         </TableCell>
                         <TableCell>
                           {row.sku}
@@ -394,7 +481,7 @@ const Dashboard = () => {
                           <IconButton size="small" className={classes.rightIcon}>
                             <SaveIcon color="primary" />
                           </IconButton>
-                          <IconButton size="small" className={classes.rightIcon} onClick={(e) => {recycleTheMockup(e, row.sku.toString())}}>
+                          <IconButton size="small" className={classes.rightIcon} onClick={(e) => {recycleTheMugPattern(e, row.sku.toString())}}>
                             <DeleteIcon color="secondary" />
                           </IconButton>
                           <IconButton size="small" className={classes.rightIcon}>

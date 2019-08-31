@@ -92,10 +92,9 @@ const StepUploadDesign = (props: any) => {
   const theme = useTheme();
   const classes = useStyles(theme);
   const inputRef = useRef(null);
-  const { designs, setDesigns } = props;
+  const { designs, setDesigns, currentDesigns, setcurrentDesigns } = props;
   const [ isOpenDropbox, setIsOpenDropbox] = React.useState(false);
   const [ designsOnDropbox, setDesignsOnDropbox ] = React.useState<any[]>([]);
-
 
   function closeDropboxPopper() {
     setIsOpenDropbox(false);
@@ -137,31 +136,35 @@ const StepUploadDesign = (props: any) => {
   const onDrop = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
 
-    let files = e.target.files as FileList;
+    const files = e.target.files as FileList;
 
     Array.from(files).forEach((file: File) => {
 
       let reader = new FileReader();
 
       reader.onloadend = () => {
-        var wasAdded = designs.findIndex(function (design: DESIGN) {
-          return design.name === file.name && design.lastModified === file.lastModified;
-        });
+        const wasAdded = designs[file.name] && (designs[file.name].name === file.name) && (designs[file.name].lastModified === file.lastModified);
 
-        if (wasAdded > -1) {
-          return;
+        let newDesign: DESIGN;
+
+        if (wasAdded) {
+          newDesign = designs[file.name];
+        } else {
+          newDesign = {
+            id: Object.keys(designs).length + 1, // TODO: async so still not get id yet
+            src: reader.result,
+            name: file.name,
+            type: file.type,
+            lastModified: file.lastModified,
+            addedAt: Date.now(),
+          } as DESIGN;
+
+          setDesigns(designs => {
+            return {...designs, [file.name]: newDesign};
+          });
         }
 
-        let newDesign = {
-          id: designs.length + 1,
-          src: reader.result,
-          name: file.name,
-          type: file.type,
-          lastModified: file.lastModified,
-          addedAt: Date.now(),
-        } as DESIGN;
-
-        setDesigns([...designs, newDesign]);
+        setcurrentDesigns([...currentDesigns, newDesign]);
       }
 
       reader.readAsDataURL(file)
@@ -171,7 +174,7 @@ const StepUploadDesign = (props: any) => {
   return (
     <>
       {
-        designs && designs.length > 0 ? designs.map((design: DESIGN, index: number) => {
+        currentDesigns && currentDesigns.length > 0 ? currentDesigns.map((design: DESIGN, index: number) => {
           return (
             <Card className={classes.card} key={'design-' + index}>
               <CardActionArea>
