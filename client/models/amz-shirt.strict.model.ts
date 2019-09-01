@@ -66,7 +66,7 @@ export type MOCKUP = APP_TYPE & {
   patternId?: number,
   patternName?: string,
   sku?: string,
-  color?: string,
+  color?: COLOR,
   link: string,
   sharedLink: string,
   b64: string | ArrayBuffer | WindowBase64,

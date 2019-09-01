@@ -12,6 +12,7 @@ import StepLabel from '@material-ui/core/StepLabel';
 
 import Grid from '@material-ui/core/Grid';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import LinearProgress from '@material-ui/core/LinearProgress';
 
 // Step Components
 import StepUploadDesigns from './StepUploadDesigns';
@@ -71,7 +72,10 @@ const useStyles = makeStyles((theme: Theme) =>
       height: 200
     },
     progress: {
-      margin: theme.spacing(2),
+      position: "fixed",
+      top: 0,
+      left: 0,
+      right: 0,
     },
   }),
 );
@@ -86,7 +90,7 @@ const NewProductPage = () => {
   const [ currentDesigns, setcurrentDesigns ] = React.useState<DESIGN[]>([]);
   const [ currentPatterns, setcurrentPatterns ] = React.useState<PATTERN[]>([]);
   const [ currentMugs, setCurrentMugs ] = useState({});
-  const [ isLoading, setIsLoading ] = useState(false);
+  const [ completed, setCompleted ] = React.useState(0);
 
   // getModalStyle is not a pure function, we roll the style only on the first render
   const [activeStep, setActiveStep] = useState(0);
@@ -142,7 +146,15 @@ const NewProductPage = () => {
 
   function generateMockupsFromMugs () {
 
-    setIsLoading(true);
+    function progress() {
+      setCompleted(oldCompleted => {
+        const diff = Math.random() * 10;
+        return Math.min(oldCompleted + diff, 90);
+      });
+    }
+
+    const timer = setInterval(progress, 500);
+    timeout(3000, Promise.resolve(clearInterval(timer)));
 
     let REQUEST_TIME = 3000;
     let genMockupPromises = [];
@@ -169,7 +181,7 @@ const NewProductPage = () => {
             if (mugPattern.colors.length) {
 
               mugPattern.colors.map((color: COLOR, cidx: number) => {
-                const fileName = designName.replace('.png', '-') + mugPattern.name.replace('.png', '-') + Date.now() + '.png' ;
+                const fileName = 'mockup-' + designName.replace('.png', '-') + mugPattern.name.replace('.png', '-') + Date.now() + '.png' ;
 
                 const newMockup = {
                   id: mockups.length + 1,
@@ -182,15 +194,15 @@ const NewProductPage = () => {
                   patternId: mugPattern.id,
                   patternName: mugPattern.name,
                   sku: mugPattern.data.item_sku,
-                  color: color.name,
-                  link: null,
+                  color: color,
+                  link: '/mockups/' + mugPattern.data.item_sku + '/' + fileName,
                   sharedLink: null,
                 } as MOCKUP;
 
                 setMockups([...mockups, newMockup]);
 
                 // NOTE: Merge design with color to pattern and then upload to Dropbox to get the public link.
-                genMockupPromises.push(timeout(cidx * REQUEST_TIME++, mergeDesignToPattern(designName, mugPattern.name, color, newMug.name, fileName, newMockup)));
+                genMockupPromises.push(timeout(cidx * REQUEST_TIME++, generateMockupImage(newMockup)));
               });
             }
           });
@@ -199,40 +211,39 @@ const NewProductPage = () => {
     }
 
     Promise.all(genMockupPromises).then((res) => {
-      console.log('genMockupPromises', res);
 
       let newMockups = [...mockups];
 
       res.map(info => {
         let newMockup = info.newMockup;
 
-        if (newMockup) {
+        if (!info.error || (info.error.status === 409)) {
           newMockup.uploadedAt = Date.now();
-          newMockup.link = '/mockups/' + newMockup.name;
           newMockup.sharedLink = info.sharedLink;
-          !info.error && (newMockup.b64 = null);
-
-          newMockups.push(newMockup);
+          newMockup.b64 = null;
         }
+
+        newMockups.push(newMockup);
       });
 
       setMockups(newMockups);
 
-      setIsLoading(false);
-      utils.link({ path: '/dashboard' });
+      timeout(1000, Promise.resolve(function () {
+        utils.link({ path: '/dashboard' });
+        setCompleted(100);
+      }));
     });
   }
 
-  function mergeDesignToPattern (designName: string, patternName: string, color: COLOR, mugName: string, mockupName: string, newMockup: MOCKUP) : Promise<any> {
-    // console.log('mergeDesignToPattern', designName, patternName);
+  function generateMockupImage (newMockup: MOCKUP) : Promise<any> {
 
-    const designSrc = designs[designName].src;
-    const patternSrc = patterns[patternName].src;
+    const designSrc = designs[newMockup.designName].src;
+    const patternSrc = patterns[newMockup.patternName].src;
 
     var canvas = document.createElement('canvas') as HTMLCanvasElement;
     var ctx = canvas.getContext('2d');
 
-    return new Promise(function (resolve, reject) {
+    return new Promise(function (resolve) {
 
       var textureIMG = new Image();
       textureIMG.src = patternSrc;
@@ -243,7 +254,7 @@ const NewProductPage = () => {
 
         ctx.drawImage(textureIMG,0,0);
         ctx.globalCompositeOperation = "source-in";
-        ctx.fillStyle = color.hex;
+        ctx.fillStyle = newMockup.color.hex;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         var colorFilledB64 = canvas.toDataURL();
@@ -255,27 +266,25 @@ const NewProductPage = () => {
         ])
         .then((b64: any) => {
 
-          if (newMockup) {
-            newMockup.b64 = b64;
-          }
+          newMockup.b64 = b64;
 
           // TODO: Save to the dropbox folder and then wait for syncing to the server. Get the image link afterward to update to "data" for each mockup
 
           // const canvas = createCanvas(1000, 1000, 'pdf');
           // const img = new Image();
           // resolve(saveAs(b64, designName + patternName));
-          // document.querySelector('#demoImg').src = b64;
-          return resolve(uploadMockupToDropbox(mockupName, b64, color.name, newMockup));
+          return resolve(uploadMockupToDropbox(b64, newMockup));
         });
       };
     });
   }
 
-  function uploadMockupToDropbox (mockupName: string, b64: any, color: string, newMockup: MOCKUP) : Promise<any> {
+  async function uploadMockupToDropbox (b64: any, newMockup: MOCKUP) : Promise<any> {
     const i = b64.indexOf('base64,');
     const buffer = Buffer.from(b64.slice(i + 7), 'base64');
+    const uploadUrl = newMockup.link || '/mockups/' + newMockup.sku + '/' + newMockup.name;
 
-    return services.dropbox.filesUpload({path: '/mockups/' + mockupName, contents: buffer})
+    return services.dropbox.filesUpload({path: uploadUrl, contents: buffer})
       .then(function (newFileInfo) {
         // console.log(newFileInfo, newFileInfo.sharing_info);
         // https://www.dropbox.com/sh/7jyd3yzxfghzmye/AAClDv4NEMP9IinbLKl1oQ_Va/design-text-1pattern-TShirt-black.png?dl=0
@@ -289,7 +298,7 @@ const NewProductPage = () => {
         return services.dropbox.sharingCreateSharedLinkWithSettings({path: newFileInfo.path_display, settings: settings})
           .then(function (sharedInfo) {
 
-            return { mockupName: mockupName, color: color, newMockup: newMockup, sharedLink: sharedInfo.url };
+            return { mockupName: newMockup.name, newMockup: newMockup, sharedLink: sharedInfo.url };
 
             //   {
             //     ".tag": "file",
@@ -322,19 +331,19 @@ const NewProductPage = () => {
           })
           .catch(function (error) {
             // console.error('dropbox sharingCreateSharedLinkWithSettings', error);
-            return { error: true, mockupName: mockupName, color: color, newMockup: newMockup, sharedLink: 'cannot get shared link "' + mockupName + '"' };
+            return { error: error, mockupName: newMockup.name, newMockup: newMockup, sharedLink: 'cannot get shared link "' + newMockup.name + '"' };
           });
       })
       .catch(function (error) {
         // console.error('dropbox filesUpload', error);
-        return { error: true, mockupName: mockupName, color: color, newMockup: newMockup, sharedLink: 'cannot get shared link "' + mockupName + '"' };
+        return { error: error, mockupName: newMockup.name, newMockup: newMockup, sharedLink: 'cannot get shared link "' + newMockup.name + '"' };
       });
   }
 
   return (
     <div className={classes.root}>
       {
-        isLoading ? <CircularProgress className={classes.progress} /> : ''
+        completed ? <LinearProgress className={classes.progress} variant="determinate" value={completed} /> : ''
       }
       <Stepper activeStep={activeStep}>
         {steps.map((label, index) => {

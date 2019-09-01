@@ -25,6 +25,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import SaveIcon from '@material-ui/icons/Save';
 import EditIcon from '@material-ui/icons/Edit';
 import ContentCopyIcon from '@material-ui/icons/FileCopy';
+import SyncProblem from '@material-ui/icons/SyncProblem';
 
 // Components
 import Layout from '../Layout/Layout';
@@ -37,7 +38,7 @@ import blue from '@material-ui/core/colors/blue';
 import red from '@material-ui/core/colors/red';
 import cyan from '@material-ui/core/colors/cyan';
 
-import tShirt from '../../../assets/img/tshirt.webp';
+import services from '../../services';
 import utils from '../../utils';
 import XLSX from 'xlsx';
 
@@ -45,16 +46,20 @@ import XLSX from 'xlsx';
 import { DESIGN, MOCKUP, MUG, MUG_PATTERN, COLOR, SIZE, AMZ_APP_SHIRT, AMZ_DEFAULT_ROW, AMZ_FIELD_ORDER } from "../../models/amz-shirt.strict.model";
 
 
+// import tShirt from '../../../assets/img/tshirt.webp';
 // const demoImg = 'https://cdn.shopify.com/s/files/1/1312/0893/products/004.jpg?v=1491851162';
-const demoImg = tShirt;
+// const demoImg = tShirt;
 
-interface RowData {
+type KeySortable = {
   sku: string;
   designName: string;
   patternName: string;
   mockupImage: string;
   status: string;
   createdAt: string;
+}
+
+type RowData = KeySortable & {
   mugPattern: MUG_PATTERN,
 }
 
@@ -143,16 +148,19 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: theme.spacing(1),
     },
     green: {
-      background: lightGreen[500],
+      color: lightGreen[500],
     },
-    blue: {
-      background: blue[500]
+    bggreen: {
+      backgroundColor: lightGreen[500],
     },
-    red: {
-      background: red[500]
+    bgblue: {
+      backgroundColor: blue[500]
     },
-    cyan: {
-      background: cyan[500]
+    bgred: {
+      backgroundColor: red[500]
+    },
+    bgcyan: {
+      backgroundColor: cyan[500]
     },
     modal: {
       position: 'absolute',
@@ -184,7 +192,7 @@ const Dashboard = () => {
   const theme = useTheme();
   const classes = useStyles(theme);
   const [ order, setOrder ] = useState<Order>('asc');
-  const [ orderBy, setOrderBy ] = useState<keyof RowData>('sku');
+  const [ orderBy, setOrderBy ] = useState<keyof KeySortable>('sku');
   const [ page, setPage ] = useState(0);
   const [ dense, setDense ] = useState(true);
   const [ rowsPerPage, setRowsPerPage ] = useState(10);
@@ -195,10 +203,25 @@ const Dashboard = () => {
   const [ selectedMugPatterns, setSelectedMugPatterns ] = useState<MUG_PATTERN[]>([]);
   const [ emptyRows, setEmptyRows ] = useState(loadRowPerPage());
 
-  function handleRequestSort(event: React.MouseEvent<unknown>, property: keyof RowData) {
+
+  function handleRequestSort(event: React.MouseEvent<unknown>, property: keyof KeySortable) {
     const isDesc = orderBy === property && order === 'desc';
     setOrder(isDesc ? 'asc' : 'desc');
     setOrderBy(property);
+  }
+
+  function handleChangePage(event: unknown, newPage: number) {
+    setPage(newPage);
+  }
+
+  function handleChangeRowsPerPage(event: React.ChangeEvent<HTMLInputElement>) {
+    setRowsPerPage(+event.target.value);
+    setEmptyRows(loadRowPerPage());
+    setPage(0);
+  }
+
+  function handleChangeDense(event: React.ChangeEvent<HTMLInputElement>) {
+    setDense(event.target.checked);
   }
 
   function selectAllMugPatterns(event: React.ChangeEvent<HTMLInputElement>) {
@@ -211,12 +234,15 @@ const Dashboard = () => {
     setSelectedMugPatterns([]);
   }
 
-  function selectMugPattern(event: React.MouseEvent<unknown>, mugPattern: MUG_PATTERN) {
-    const selectedIndex = selectedMugPatterns.indexOf(mugPattern);
+  function selectMugPattern(event: React.MouseEvent<unknown>, rowData: RowData) {
+    const row = rows.find(row => {
+      return row.mugPattern.name === rowData.patternName && row.mugPattern.data.item_sku === rowData.sku;
+    });
+    const selectedIndex = selectedMugPatterns.indexOf(row.mugPattern);
     let newSelected: MUG_PATTERN[] = [];
 
     if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selectedMugPatterns, mugPattern);
+      newSelected = newSelected.concat(selectedMugPatterns, row.mugPattern);
     }
     else if (selectedIndex === 0) {
       newSelected = newSelected.concat(selectedMugPatterns.slice(1));
@@ -234,28 +260,9 @@ const Dashboard = () => {
     setSelectedMugPatterns(newSelected);
   }
 
-  function handleChangePage(event: unknown, newPage: number) {
-    setPage(newPage);
-  }
+  function createData(design: DESIGN, mugPattern: MUG_PATTERN, mockup: MOCKUP, isUploadedError: boolean): RowData {
 
-  function handleChangeRowsPerPage(event: React.ChangeEvent<HTMLInputElement>) {
-    setRowsPerPage(+event.target.value);
-    setEmptyRows(loadRowPerPage());
-    setPage(0);
-  }
-
-  function handleChangeDense(event: React.ChangeEvent<HTMLInputElement>) {
-    setDense(event.target.checked);
-  }
-
-  function createData(design: DESIGN, mugPattern: MUG_PATTERN, mockup: MOCKUP): RowData {
-
-    let status = 'Pending';
-
-    if (mockup.uploadedAt !== null) {
-      status = 'Uploaded';
-    };
-
+    const status = isUploadedError ? 'Pending' : 'Uploaded';
     const createdAt = new Date(mockup.addedAt).toISOString();
 
     const rowdata = {
@@ -280,11 +287,23 @@ const Dashboard = () => {
       if (!mug.recycledAt) {
         mug.patterns.map((mugPattern: MUG_PATTERN) => {
           if (mugPattern.colors.length) {
-            const mockup: MOCKUP = mockups.find((mockup: MOCKUP) => {
-              return (mockup.patternId === mugPattern.id) && (mockup.designName === mug.designName)
-            });
             const design: DESIGN = designs[mug.designName];
-            rowdata.push(createData(design, mugPattern, mockup));
+            const filterdMockups: MOCKUP[] = mockups.filter((mockup: MOCKUP) => {
+              // Get all mockups belong to this mugPattern.
+              if (mockup && (mockup.patternName === mugPattern.name) && (mockup.designName === mug.designName)) {
+                return mockup;
+              }
+            });
+            const isUploadedError = filterdMockups.some((mockup: MOCKUP) => {
+              // If there is any mockup has not uploaded then it need to be resynced.
+              return !mockup.sharedLink;
+            });
+            const mockup = filterdMockups.find((mockup: MOCKUP) => {
+              // Get mockup info from the first mockup has uploaded.
+              return !!mockup.sharedLink;
+            });
+
+            rowdata.push(createData(design, mugPattern, mockup, isUploadedError));
           }
         });
       }
@@ -297,24 +316,90 @@ const Dashboard = () => {
     return rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
   }
 
-  const recycleTheMugPattern = (event: React.MouseEvent, sku: string) => {
+  function recycleTheMugPattern (event: React.MouseEvent, sku: string) {
     event.preventDefault();
     event.stopPropagation();
 
     if (confirm('Do you want to recycle this mug-pattern "' + sku + '"?')) {
-      const newMockups = mockups.map((mockup: any) => {
-        if (mockup.data.item_sku === sku) {
-          mockup.recycled = true;
+      const newMugPatterns = rows.filter((row: RowData) => {
+        if (row.mugPattern.data.item_sku === sku) {
+          row.mugPattern['recycledAt'] = Date.now();
         };
-        return mockup;
+        return row.mugPattern;
       });
 
-      setMockups(newMockups);
+      console.log('recycleTheMugPattern, newList', newMugPatterns);
+
+      // setMockups(newMugPatterns);
       setRows(loadData());
     }
   };
 
-  function exportToExcel () {
+  function reSyncMockup(event: React.MouseEvent, row: RowData) {
+    event.stopPropagation();
+
+    const filterdMockups: MOCKUP[] = mockups.filter((mockup: MOCKUP) => {
+      // Get all mockups belong to this mugPattern.
+      return mockup && (mockup.patternName === row.patternName) && (mockup.designName === row.designName) && !mockup.sharedLink;
+    });
+
+    const promises = [];
+
+    filterdMockups.map(mockup => {
+      promises.push(uploadMockupToDropbox(mockup));
+    });
+
+    Promise.all(promises).then((res) => {
+
+      // Update mockups store.
+      let newMockups = [...mockups];
+
+      res.map(info => {
+        let mockupInfo = info.mockup;
+
+        if (!info.error || (info.error.status === 409)) {
+          newMockups.map((mockup: MOCKUP) => {
+            if (mockup && (mockup.name === mockupInfo.name)) {
+              mockupInfo.uploadedAt = Date.now();
+              mockupInfo.sharedLink = info.sharedLink;
+              mockupInfo.b64 = null;
+            }
+          });
+        }
+      });
+
+      setMockups(newMockups);
+      setRows(loadData());
+    });
+  };
+
+  async function uploadMockupToDropbox (mockup: MOCKUP) : Promise<any> {
+    const i = mockup.b64.toString().indexOf('base64,');
+    const buffer = Buffer.from(mockup.b64.toString().slice(i + 7), 'base64');
+    const uploadUrl = mockup.link || '/mockups/' + mockup.sku + '/' + mockup.name;
+
+    return services.dropbox.filesUpload({path: uploadUrl, contents: buffer})
+      .then(function (newFileInfo) {
+        const settings = {
+          'requested_visibility': {'.tag': 'public'} as DropboxTypes.sharing.RequestedVisibility,
+          'audience': {'.tag': 'public'} as DropboxTypes.sharing.LinkAudiencePublic,
+          'access': {'.tag': 'viewer'} as DropboxTypes.sharing.RequestedLinkAccessLevel,
+        };
+
+        return services.dropbox.sharingCreateSharedLinkWithSettings({path: newFileInfo.path_display, settings: settings})
+          .then(function (sharedInfo) {
+            return { mockup: mockup, sharedLink: sharedInfo.url };
+          })
+          .catch(function (error) {
+            return { error: error, mockup: mockup, sharedLink: 'cannot get shared link "' + mockup.name + '"' };
+          });
+      })
+      .catch(function (error) {
+        return { error: error, mockup: mockup, sharedLink: 'cannot get shared link "' + mockup.name + '"' };
+      });
+  }
+
+  function exportToExcel() {
 
     // NOTE: Adding 3 first rows for AMZ
     let exportedData = [ AMZ_DEFAULT_ROW ];
@@ -358,9 +443,16 @@ const Dashboard = () => {
       mugPattern.colors.map((color: COLOR, cidx: number) => {
 
         const mockup: MOCKUP = mockups.find((mockup: MOCKUP) => {
-          return mockup.patternName === mugPattern.name && mockup.color === color.name;
+          return mockup.patternName === mugPattern.name && mockup.color.name === color.name;
         });
-        const sharedLink = mockup ? (mockup.sharedLink || mockup.b64 || 'async problem') : 'sharedLink';
+
+        if (mockup && !mockup.sharedLink && mockup.b64) {
+          alert('ERROR: There are some Mockups were not uploaded yet, hence cannot getting mockups sharedLink to export to Excel file.');
+          return;
+        }
+
+        // const sharedLink = mockup ? (mockup.sharedLink || mockup.b64 || 'async problem') : 'sharedLink';
+        const sharedLink = mockup.sharedLink || mockup.b64;
 
         mugPattern.sizes.map((size: SIZE, sidx: number) => {
 
@@ -401,20 +493,20 @@ const Dashboard = () => {
     <Layout>
       <div className={classes.root}>
         <Box component="span" display="block" className={classes.buttonGroup}>
-          <Button size="medium" variant="contained" color="primary" className={clsx(classes.button, classes.cyan)} onClick={() => {}}>
+          <Button size="medium" variant="contained" color="primary" className={clsx(classes.button, classes.bgcyan)} onClick={() => {}}>
             <SyncIcon className={classes.rightIcon} />
             Re-sync Error Products
           </Button>
-          <Button size="medium" variant="contained" color="primary" className={clsx(classes.button, classes.red)} onClick={() => {}}>
+          <Button size="medium" variant="contained" color="primary" className={clsx(classes.button, classes.bgred)} onClick={() => {}}>
             <DeleteIcon className={classes.rightIcon} />
             Recycle
           </Button>
-          <Button size="medium" variant="contained" color="primary" className={clsx(classes.button, classes.green)}
+          <Button size="medium" variant="contained" color="primary" className={clsx(classes.button, classes.bggreen)}
             onClick={() => {exportToExcel()}}>
             <GetApp className={classes.rightIcon} />
             Export
           </Button>
-          <Button size="medium" variant="contained" color="primary" className={clsx(classes.button, classes.blue)}
+          <Button size="medium" variant="contained" color="primary" className={clsx(classes.button, classes.bgblue)}
             onClick={() => utils.link({path: '/newProduct'})}>
             <AddIcon className={classes.rightIcon} />
             New Product
@@ -444,7 +536,7 @@ const Dashboard = () => {
                     return (
                       <TableRow
                         hover
-                        onClick={event => selectMugPattern(event, row.mugPattern)}
+                        onClick={event => selectMugPattern(event, row)}
                         role="checkbox"
                         aria-checked={isItemSelected}
                         tabIndex={-1}
@@ -457,10 +549,12 @@ const Dashboard = () => {
                         <TableCell>
                           {
                             (row.status === 'Uploaded') ?
-                              <Chip label={row.status} color="primary" className={classes.chip} /> :
-                              <Chip label={row.status} color="secondary" className={classes.chip} />
+                              <Typography id="productStatus" className={classes.green}>{row.status}</Typography>
+                              :
+                              <IconButton size="small" onClick={event => reSyncMockup(event, row)}>
+                                <SyncProblem color="secondary" className={classes.chip} />
+                              </IconButton>
                           }
-                          {/* <Typography id="productStatus" color={"primary"}>{row.status}</Typography> */}
                         </TableCell>
                         <TableCell>
                           <img src={row.mockupImage} alt={row.designName + row.patternName} className={classes.rowImg} />
@@ -481,7 +575,7 @@ const Dashboard = () => {
                           <IconButton size="small" className={classes.rightIcon}>
                             <SaveIcon color="primary" />
                           </IconButton>
-                          <IconButton size="small" className={classes.rightIcon} onClick={(e) => {recycleTheMugPattern(e, row.sku.toString())}}>
+                          <IconButton size="small" className={classes.rightIcon} onClick={(e) => {recycleTheMugPattern(e, row.sku)}}>
                             <DeleteIcon color="secondary" />
                           </IconButton>
                           <IconButton size="small" className={classes.rightIcon}>
