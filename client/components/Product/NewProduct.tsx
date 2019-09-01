@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { createStyles, makeStyles, useTheme, Theme } from '@material-ui/core/styles';
+import clsx from 'clsx';
+
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
-
-import mergeImages from 'merge-images';
-import { saveAs } from 'file-saver';
 
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
@@ -24,6 +23,9 @@ import lightGreen from '@material-ui/core/colors/lightGreen';
 
 // Models
 import { DESIGN, PATTERN, MOCKUP, MUG, MUG_PATTERN, COLOR, AMZ_DEFAULT_ROW, AMZ_FIELD_ORDER } from "../../models/amz-shirt.strict.model";
+
+import mergeImages from 'merge-images';
+import { saveAs } from 'file-saver';
 
 import services from '../../services';
 import utils from '../../utils';
@@ -72,11 +74,14 @@ const useStyles = makeStyles((theme: Theme) =>
       height: 200
     },
     progress: {
-      position: "fixed",
+      position: 'fixed',
       top: 0,
       left: 0,
       right: 0,
     },
+    hide: {
+      display: 'none',
+    }
   }),
 );
 
@@ -99,7 +104,11 @@ const NewProductPage = () => {
   function handleNext() {
     if (activeStep === steps.length - 1) {
       // NOTE: Finish step
-      generateMockupsFromMugs();
+      if (Object.keys(currentMugs).length > 0) {
+        generateMockupsFromMugs();
+      } else {
+        return;
+      }
     } else {
       setActiveStep(prevActiveStep => prevActiveStep + 1);
     }
@@ -146,15 +155,18 @@ const NewProductPage = () => {
 
   function generateMockupsFromMugs () {
 
-    function progress() {
-      setCompleted(oldCompleted => {
-        const diff = Math.random() * 10;
-        return Math.min(oldCompleted + diff, 90);
-      });
-    }
+    setCompleted(oldCompleted => {
+      if (oldCompleted === 100) {
+        oldCompleted = 0;
+      }
 
-    const timer = setInterval(progress, 500);
-    timeout(3000, Promise.resolve(clearInterval(timer)));
+      const diff = Math.random() * 10;
+      oldCompleted += diff;
+
+      return Math.min(oldCompleted + diff, 90);
+    });
+
+    const timer = setInterval(setCompleted, 1000);
 
     let REQUEST_TIME = 3000;
     let genMockupPromises = [];
@@ -228,10 +240,11 @@ const NewProductPage = () => {
 
       setMockups(newMockups);
 
-      timeout(1000, Promise.resolve(function () {
-        utils.link({ path: '/dashboard' });
+      setTimeout(() => {
+        clearInterval(timer);
         setCompleted(100);
-      }));
+        utils.link({ path: '/dashboard' });
+      }, 3000);
     });
   }
 
@@ -384,6 +397,7 @@ const NewProductPage = () => {
                 color="primary"
                 onClick={handleNext}
                 className={classes.button}
+                disabled={(activeStep === steps.length - 1) && (Object.keys(currentMugs).length > 0)}
               >
                 {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
               </Button>
