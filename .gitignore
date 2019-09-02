@@ -1,9 +1,12 @@
 # list file and folder not be commited
 
+.next
 hs_err_pid*
 data
 build
+dist
 themes
 node_modules
-bower_components
 npm-debug.log
+.dropbox.config.ts
+package-lock.json
