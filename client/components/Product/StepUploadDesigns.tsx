@@ -136,38 +136,55 @@ const StepUploadDesign = (props: any) => {
   const onDrop = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
 
+    let promises = [];
     const files = e.target.files as FileList;
 
     Array.from(files).forEach((file: File) => {
 
       let reader = new FileReader();
 
-      reader.onloadend = () => {
-        const wasAdded = designs[file.name] && (designs[file.name].name === file.name) && (designs[file.name].lastModified === file.lastModified);
+      const loadDesign = new Promise(function(resolve) {
+        reader.onloadend = () => {
+          const wasAdded = designs[file.name] && (designs[file.name].name === file.name) && (designs[file.name].lastModified === file.lastModified);
+          let newDesign: DESIGN;
 
-        let newDesign: DESIGN;
+          if (wasAdded) {
+            // TODO: This is still not update to "designs" store.
+            newDesign = designs[file.name];
+          } else {
+            newDesign = {
+              id: Object.keys(designs).length + 1, // TODO: async so still not get id yet
+              src: reader.result,
+              name: file.name,
+              type: file.type,
+              lastModified: file.lastModified,
+              addedAt: Date.now(),
+            } as DESIGN;
+          }
 
-        if (wasAdded) {
-          newDesign = designs[file.name];
-        } else {
-          newDesign = {
-            id: Object.keys(designs).length + 1, // TODO: async so still not get id yet
-            src: reader.result,
-            name: file.name,
-            type: file.type,
-            lastModified: file.lastModified,
-            addedAt: Date.now(),
-          } as DESIGN;
+          resolve({ wasAdded: wasAdded, newDesign: newDesign });
+        };
+      });
 
-          setDesigns(designs => {
-            return {...designs, [file.name]: newDesign};
-          });
-        }
-
-        setcurrentDesigns([...currentDesigns, newDesign]);
-      }
+      promises.push(loadDesign);
 
       reader.readAsDataURL(file)
+    });
+
+    Promise.all(promises).then(res => {
+      let newDesigns = {...designs};
+      let newCurrentDesigns = [...currentDesigns];
+
+      res.map(info => {
+        if (!info.wasAdded) {
+          newDesigns[info.newDesign.name] = info.newDesign;
+        }
+
+        newCurrentDesigns.push(info.newDesign);
+      });
+
+      setDesigns(newDesigns);
+      setcurrentDesigns(newCurrentDesigns);
     });
   };
 

@@ -136,38 +136,55 @@ const StepUploadPatterns = (props: any) => {
   function onDrop(e: React.ChangeEvent<HTMLInputElement>) {
     e.preventDefault();
 
+    let promises = [];
     const files = e.target.files as FileList;
 
     Array.from(files).forEach((file: File) => {
 
       let reader = new FileReader();
 
-      reader.onloadend = () => {
-        const wasAdded = patterns[file.name] && (patterns[file.name].name === file.name) && (patterns[file.name].lastModified === file.lastModified);
+      const loadPattern = new Promise(function(resolve) {
+        reader.onloadend = () => {
+          const wasAdded = patterns[file.name] && (patterns[file.name].name === file.name) && (patterns[file.name].lastModified === file.lastModified);
+          let newPattern: PATTERN;
 
-        let newPattern: PATTERN;
+          if (wasAdded) {
+            // TODO: This is still not update to "patterns" store.
+            newPattern = patterns[file.name];
+          } else {
+            newPattern = {
+              id: Object.keys(patterns).length + 1, // TODO: async so still not get id yet
+              src: reader.result,
+              name: file.name,
+              type: file.type,
+              lastModified: file.lastModified,
+              addedAt: Date.now(),
+            } as PATTERN;
+          }
 
-        if (wasAdded) {
-          newPattern = patterns[file.name];
-        } else {
-          newPattern = {
-            id: Object.keys(patterns).length + 1, // TODO: async so still not get id yet
-            src: reader.result,
-            name: file.name,
-            type: file.type,
-            lastModified: file.lastModified,
-            addedAt: Date.now(),
-          } as PATTERN;
+          resolve({ wasAdded: wasAdded, newPattern: newPattern });
+        };
+      });
 
-          setPatterns(patterns => {
-            return {...patterns, [file.name]: newPattern};
-          });
-        }
-
-        setcurrentPatterns([...currentPatterns, newPattern]);
-      }
+      promises.push(loadPattern);
 
       reader.readAsDataURL(file);
+    });
+
+    Promise.all(promises).then(res => {
+      let newPatterns = {...patterns};
+      let newCurrentPatterns = [...currentPatterns];
+
+      res.map(info => {
+        if (!info.wasAdded) {
+          newPatterns[info.newPattern.name] = info.newPattern;
+        }
+
+        newCurrentPatterns.push(info.newPattern);
+      });
+
+      setPatterns(newPatterns);
+      setcurrentPatterns(newCurrentPatterns);
     });
   };
 
