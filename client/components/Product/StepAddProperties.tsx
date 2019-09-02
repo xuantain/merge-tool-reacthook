@@ -629,16 +629,31 @@ const StepAddProperties = (props: any) => {
   const theme = useTheme();
   const classes = useStyles(theme);
   const { designs, patterns, currentDesigns, currentPatterns, currentMugs, setCurrentMugs } = props;
+  const [ isExpanded, setIsExpanded ] = useState(false);
 
-  const addPatternToMug = (e: React.MouseEvent, design: DESIGN, pattern: PATTERN) => {
+  function handleExpand () {
+    setIsExpanded(!isExpanded);
+  }
 
-    if (currentMugs[design.name] && currentMugs[design.name].patterns.length > 0) {
-      e.stopPropagation();
-    }
+  function addPatternToMug (e: React.MouseEvent, design: DESIGN, pattern: PATTERN) {
 
-    const wasAdded = currentMugs[design.name] && currentMugs[design.name].patterns.some((patternItem: MUG_PATTERN) => {
+    const currentMugPattern = currentMugs[design.name];
+
+    const wasAdded = currentMugPattern && currentMugPattern.patterns.some((patternItem: MUG_PATTERN) => {
       return patternItem.name === pattern.name;// && patternItem.id === pattern.id;
     });
+
+    if (
+      !currentMugPattern ||
+      (!isExpanded &&
+        (!wasAdded && currentMugPattern && currentMugPattern.patterns.length === 0) ||
+        (wasAdded && currentMugPattern && currentMugPattern.patterns.length === 1)
+      )
+    ) {
+      setIsExpanded(true);
+    } else {
+      e.stopPropagation();
+    }
 
     if (wasAdded) {
 
@@ -674,7 +689,7 @@ const StepAddProperties = (props: any) => {
 
       setCurrentMugs((currentMugs: { key: MUG }) => {
 
-        let currentMug = currentMugs[design.name] || newMug;
+        let currentMug = currentMugPattern || newMug;
         const newPatterns = [...currentMug.patterns, newMugPattern];
 
         currentMug.patterns = newPatterns;
@@ -682,7 +697,7 @@ const StepAddProperties = (props: any) => {
         return {...currentMugs, [design.name]: currentMug};
       });
     }
-  };
+  }
 
   function isPatternChoosen (designName: string, patternName: string) : boolean {
     return currentMugs[designName] && currentMugs[designName].patterns.some((patternItem: MUG_PATTERN) => {
@@ -703,6 +718,7 @@ const StepAddProperties = (props: any) => {
                 expandIcon={<ExpandMoreIcon />}
                 aria-controls={"designItem-content-" + mugDesignIndex}
                 id={"designItem-header-" + mugDesignIndex}
+                onClick={handleExpand}
               >
                 {/* Show Design Image & Info */}
                 <Card className={classes.card}>
@@ -737,7 +753,12 @@ const StepAddProperties = (props: any) => {
                 <Grid container>
                 {
                   currentMugs && currentMugs[design.name] && currentMugs[design.name].patterns && currentMugs[design.name].patterns.map((mugPattern: MUG_PATTERN, mugPatternIndex: number) => (
-                    <Grid item xs={12} sm={6} lg={6} key={'mugPatternImage-'+ mugDesignIndex + '-' + mugPatternIndex}>
+                    <Grid item
+                      xs={12}
+                      sm={currentMugs[design.name].patterns.length > 1 ? 6 : 12}
+                      lg={currentMugs[design.name].patterns.length > 1 ? 6 : 12}
+                      key={'mugPatternImage-'+ mugDesignIndex + '-' + mugPatternIndex}
+                    >
                       <FormFields
                         designName={design.name} mugPattern={mugPattern} patterns={patterns}
                         currentMugs={currentMugs} setCurrentMugs={setCurrentMugs}
