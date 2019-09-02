@@ -24,6 +24,9 @@ import Input from '@material-ui/core/Input';
 import Select from '@material-ui/core/Select';
 import Chip from '@material-ui/core/Chip';
 
+// Custom component
+import IChip from  '../common/IChip';
+
 // Colors
 import { lightGreen, red } from '@material-ui/core/colors';
 
@@ -112,11 +115,11 @@ const useStyles = makeStyles((theme: Theme) =>
     filledData: {
       backgroundColor: lightGreen[500],
     },
-    chip: {
-      margin: theme.spacing(1),
+    chipContent: {
+      marginTop: theme.spacing(6),
     },
     chipChecked: {
-      background: lightGreen[500],
+      opacity: 1,
     },
   }),
 );
@@ -165,10 +168,10 @@ const getDefaultMockupInfos = (designName: string): AMZ_APP_SHIRT => {
   };
 };
 
-const FormFields = (props: { designName: string, mugPattern: MUG_PATTERN, currentMugs: any, setCurrentMugs: Function}) => {
+const FormFields = (props: { designName: string, mugPattern: MUG_PATTERN, patterns: PATTERN[], currentMugs: any, setCurrentMugs: Function}) => {
   const theme = useTheme();
   const classes = useStyles(theme);
-  const { designName, mugPattern, currentMugs, setCurrentMugs } = props;
+  const { designName, mugPattern, patterns, currentMugs, setCurrentMugs } = props;
   const [ colors, setColors ] = utils.useStateWithLocalStorage('colors', []);
   // const [ amzcolorname, setAmzcolorname ] = useState<COLOR[]>(mugPattern.colors);
 
@@ -182,32 +185,117 @@ const FormFields = (props: { designName: string, mugPattern: MUG_PATTERN, curren
   // };
 
   const toggleColorToMug = (color: COLOR) => () => {
-    const idx = mugPattern.colors.findIndex(colorItem => {return colorItem.hex === color.hex});
 
-    if (idx === -1) {
-      mugPattern.colors.push(color);
-    } else {
-      mugPattern.colors.slice(idx, 1);
-    }
+    setCurrentMugs((currentMugs: MUG_PATTERN[]) => {
+      let newcurrentMugs = {...currentMugs};
+      let newMugPatternInfo = newcurrentMugs[designName].patterns.find((imugPattern: MUG_PATTERN) => {
+        return imugPattern.name === mugPattern.name && imugPattern.data.item_sku === mugPattern.data.item_sku;
+      });
+      const idx = mugPattern.colors.findIndex(colorItem => {return colorItem.hex === color.hex});
 
-    setCurrentMugs(currentMugs => { return {...currentMugs} });
+      if (idx === -1) {
+        newMugPatternInfo.colors.push(color);
+      } else {
+        newMugPatternInfo.colors.splice(idx, 1);
+      }
+
+      return newcurrentMugs;
+    });
   };
 
   const toggleSizeToMug = (size: SIZE) => () => {
-    const idx = mugPattern.sizes.findIndex(sizeItem => {return sizeItem.appSize === size.appSize});
 
-    if (idx === -1) {
-      mugPattern.sizes.push(size);
-    } else {
-      mugPattern.sizes.slice(idx, 1);
-    }
+    setCurrentMugs((currentMugs: MUG_PATTERN) => {
+      let newcurrentMugs = {...currentMugs};
+      let newMugPatternInfo = newcurrentMugs[designName].patterns.find((imugPattern: MUG_PATTERN) => {
+        return imugPattern.name === mugPattern.name && imugPattern.data.item_sku === mugPattern.data.item_sku;
+      });
+      const idx = mugPattern.sizes.findIndex(sizeItem => {return sizeItem.appSize === size.appSize});
 
-    setCurrentMugs(currentMugs => { return {...currentMugs} });
+      if (idx === -1) {
+        newMugPatternInfo.sizes.push(size);
+      } else {
+        newMugPatternInfo.sizes.splice(idx, 1);
+      }
+
+      return newcurrentMugs;
+    });
   };
 
   return (
     <form className={clsx(classes.formFields)} noValidate autoComplete="off">
       <Grid container>
+        <Grid item xs={12} sm={6} lg={4}>
+          <Card className={classes.card}>
+            <CardActionArea>
+              <CardMedia
+                className={classes.designImg}
+                image={patterns[mugPattern.name].src.toString()}
+                title={mugPattern.name}
+              />
+            </CardActionArea>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} lg={4}>
+          <FormControl fullWidth className={classes.textField} id="amz-field-color_name">
+            <InputLabel>Color</InputLabel>
+            <div className={classes.chipContent}>
+              {APP_COLORS.map(color => (
+                  <IChip
+                    key={'mockupColor-' + designName + '-' + mugPattern + '-' + color.name}
+                    label={color.name}
+                    color={color}
+                    onClick={toggleColorToMug(color)}
+                    className={clsx({ [classes.chipChecked]: mugPattern.colors.findIndex(mugColor => {return mugColor.hex === color.hex}) > -1 } )}
+                  />
+              ))}
+            </div>
+          </FormControl>
+        </Grid>
+        {/* <Grid item xs={12} sm={6} lg={4}>
+          <FormControl fullWidth className={classes.textField}>
+            <InputLabel htmlFor="select-multiple-chip">Color Map</InputLabel>
+            <Select
+              id="amz-field-color_map"
+              required
+              multiple
+              value={amzcolormap}
+              onChange={changeColorMap}
+              input={<Input id="select-multiple-chip" />}
+              renderValue={selected => (
+                <>
+                  {selected ? (selected as string[]).map(value => (
+                    (value === 'Blue') ?
+                      <Chip key={value} label={value} color="primary" onDelete={handleDeleteColorMap(value)} /> :
+                      <Chip key={value} label={value} color="secondary" onDelete={handleDeleteColorMap(value)} />
+                  )) : ''}
+                </>
+              )}
+              MenuProps={MenuProps}
+            >
+              {AMZ_COLOR.map(name => (
+                <MenuItem key={name} value={name}>
+                  {name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid> */}
+        <Grid item xs={12} sm={6} lg={4}>
+          <FormControl fullWidth className={classes.textField}>
+            <InputLabel>Size</InputLabel>
+            <div className={classes.chipContent}>
+              {APP_SIZES.map(size => (
+                  <IChip
+                    key={'mockupSize-' + designName + '-' + mugPattern.name + '-' + size.amzSize}
+                    label={size.appSize}
+                    onClick={toggleSizeToMug(size)}
+                    className={clsx({ [classes.chipChecked]: mugPattern.sizes.findIndex(mugSize => {return mugSize.appSize === size.appSize}) !== -1 } )}
+                  />
+              ))}
+            </div>
+          </FormControl>
+        </Grid>
         <Grid item xs={12} sm={6} lg={4}>
           <TextField
             required
@@ -216,6 +304,51 @@ const FormFields = (props: { designName: string, mugPattern: MUG_PATTERN, curren
             label="Seller SKU"
             defaultValue={mugPattern.data.item_sku}
             placeholder={mugPattern.data.item_sku}
+            className={classes.textField}
+            margin="normal"
+            InputLabelProps={{
+              shrink: true,
+            }}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} lg={4}>
+          <TextField
+            required
+            fullWidth
+            id="amz-field-item_name"
+            label="Product Name"
+            defaultValue={mugPattern.data.item_name}
+            placeholder={mugPattern.data.item_name}
+            className={classes.textField}
+            margin="normal"
+            InputLabelProps={{
+              shrink: true,
+            }}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} lg={4}>
+          <TextField
+            required
+            fullWidth
+            type="number"
+            id="amz-field-standard_price"
+            label="Standard Price"
+            defaultValue={mugPattern.data.standard_price}
+            className={classes.textField}
+            margin="normal"
+            InputLabelProps={{
+              shrink: true,
+            }}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} lg={4}>
+          <TextField
+            required
+            fullWidth
+            type="number"
+            id="amz-field-quantity"
+            label="Quantity"
+            defaultValue={mugPattern.data.quantity}
             className={classes.textField}
             margin="normal"
             InputLabelProps={{
@@ -246,21 +379,6 @@ const FormFields = (props: { designName: string, mugPattern: MUG_PATTERN, curren
             label="Brand Name"
             defaultValue={mugPattern.data.brand_name}
             placeholder={mugPattern.data.brand_name}
-            className={classes.textField}
-            margin="normal"
-            InputLabelProps={{
-              shrink: true,
-            }}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} lg={4}>
-          <TextField
-            required
-            fullWidth
-            id="amz-field-item_name"
-            label="Product Name"
-            defaultValue={mugPattern.data.item_name}
-            placeholder={mugPattern.data.item_name}
             className={classes.textField}
             margin="normal"
             InputLabelProps={{
@@ -330,120 +448,6 @@ const FormFields = (props: { designName: string, mugPattern: MUG_PATTERN, curren
             label="Is Adult Product"
             defaultValue={mugPattern.data.is_adult_product}
             placeholder={mugPattern.data.is_adult_product}
-            className={classes.textField}
-            margin="normal"
-            InputLabelProps={{
-              shrink: true,
-            }}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} lg={4}>
-          <FormControl fullWidth className={classes.textField} id="amz-field-color_name">
-            <InputLabel htmlFor="select-multiple-chip">Color</InputLabel>
-            <>
-              {APP_COLORS.map(color => (
-                  <Chip
-                    key={'mugColor-' + designName + '-' + mugPattern + '-' + color.name}
-                    label={color.name}
-                    size="small"
-                    onClick={toggleColorToMug(color)}
-                    className={clsx(classes.chip, {
-                        [classes.chipChecked]: mugPattern.colors.findIndex(mugColor => {return mugColor.hex === color.hex}) !== -1 }
-                      )}
-                    color="default"
-                    // {
-                    //   mugPattern.colors.find(mugColor => {return mugColor.hex === color.hex}).hex || ''
-                    // }
-                  />
-              ))}
-            </>
-          </FormControl>
-        </Grid>
-        {/* <Grid item xs={12} sm={6} lg={4}>
-          <FormControl fullWidth className={classes.textField}>
-            <InputLabel htmlFor="select-multiple-chip">Color Map</InputLabel>
-            <Select
-              id="amz-field-color_map"
-              required
-              multiple
-              value={amzcolormap}
-              onChange={changeColorMap}
-              input={<Input id="select-multiple-chip" />}
-              renderValue={selected => (
-                <>
-                  {selected ? (selected as string[]).map(value => (
-                    (value === 'Blue') ?
-                      <Chip key={value} label={value} color="primary" onDelete={handleDeleteColorMap(value)} /> :
-                      <Chip key={value} label={value} color="secondary" onDelete={handleDeleteColorMap(value)} />
-                  )) : ''}
-                </>
-              )}
-              MenuProps={MenuProps}
-            >
-              {AMZ_COLOR.map(name => (
-                <MenuItem key={name} value={name}>
-                  {name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Grid> */}
-        <Grid item xs={12} sm={6} lg={4}>
-          <FormControl fullWidth className={classes.textField}>
-            <InputLabel htmlFor="select-multiple-chip">Size</InputLabel>
-            <>
-              {APP_SIZES.map(size => (
-                  <Chip
-                    key={'mugSize-' + designName + '-' + mugPattern.name + '-' + size.amzSize}
-                    label={size.appSize}
-                    size="small"
-                    onClick={toggleSizeToMug(size)}
-                    className={clsx(classes.chip, {
-                        [classes.chipChecked]: mugPattern.sizes.findIndex(mugSize => {return mugSize.appSize === size.appSize}) !== -1 }
-                      )}
-                  />
-              ))}
-            </>
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} sm={6} lg={4}>
-          <TextField
-            required
-            fullWidth
-            type="number"
-            id="amz-field-standard_price"
-            label="Standard Price"
-            defaultValue={mugPattern.data.standard_price}
-            className={classes.textField}
-            margin="normal"
-            InputLabelProps={{
-              shrink: true,
-            }}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} lg={4}>
-          <TextField
-            required
-            fullWidth
-            type="number"
-            id="amz-field-quantity"
-            label="Quantity"
-            defaultValue={mugPattern.data.quantity}
-            className={classes.textField}
-            margin="normal"
-            InputLabelProps={{
-              shrink: true,
-            }}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} lg={4}>
-          <TextField
-            required
-            fullWidth
-            id="amz-field-main_image_url"
-            label="Main Image URL"
-            defaultValue={mugPattern.data.main_image_url}
-            placeholder={mugPattern.data.main_image_url}
             className={classes.textField}
             margin="normal"
             InputLabelProps={{
@@ -624,9 +628,13 @@ const FormFields = (props: { designName: string, mugPattern: MUG_PATTERN, curren
 const StepAddProperties = (props: any) => {
   const theme = useTheme();
   const classes = useStyles(theme);
-  const { designs, patterns, currentDesigns, currentPatterns, mugs, setMugs, currentMugs, setCurrentMugs } = props;
+  const { designs, patterns, currentDesigns, currentPatterns, currentMugs, setCurrentMugs } = props;
 
-  const addPatternToMug = (design: DESIGN, pattern: PATTERN) => {
+  const addPatternToMug = (e: React.MouseEvent, design: DESIGN, pattern: PATTERN) => {
+
+    if (currentMugs[design.name] && currentMugs[design.name].patterns.length > 0) {
+      e.stopPropagation();
+    }
 
     const wasAdded = currentMugs[design.name] && currentMugs[design.name].patterns.some((patternItem: MUG_PATTERN) => {
       return patternItem.name === pattern.name;// && patternItem.id === pattern.id;
@@ -635,15 +643,17 @@ const StepAddProperties = (props: any) => {
     if (wasAdded) {
 
       setCurrentMugs((currentMugs: { key: MUG }) => {
-        const idx = currentMugs[design.name] && currentMugs[design.name].patterns.findIndex((patternItem: MUG_PATTERN) => {
+        let newCurrentMugs = {...currentMugs};
+
+        const idx = newCurrentMugs[design.name] && newCurrentMugs[design.name].patterns.findIndex((patternItem: MUG_PATTERN) => {
           return patternItem.name === pattern.name;// && patternItem.id === pattern.id;
         });
-        const newPatterns = currentMugs[design.name] ? currentMugs[design.name].patterns : [];
+        const newPatterns = newCurrentMugs[design.name] ? newCurrentMugs[design.name].patterns : [];
 
         (idx > -1) && newPatterns.splice(idx, 1);
-        currentMugs[design.name].patterns = newPatterns;
+        newCurrentMugs[design.name].patterns = newPatterns;
 
-        return {...currentMugs};
+        return newCurrentMugs;
       });
     }
     else {
@@ -651,7 +661,7 @@ const StepAddProperties = (props: any) => {
       const newMugPattern = {
         id: pattern.id, // TODO: async so still not get id yet
         name: pattern.name,
-        colors: APP_COLORS,
+        colors: [...APP_COLORS],
         sizes: APP_SIZES.slice(0, 4),
         data: getDefaultMockupInfos(design.name),
       } as MUG_PATTERN;
@@ -663,50 +673,6 @@ const StepAddProperties = (props: any) => {
       } as MUG;
 
       setCurrentMugs((currentMugs: { key: MUG }) => {
-
-        let currentMug = currentMugs[design.name] || newMug;
-        const newPatterns = [...currentMug.patterns, newMugPattern];
-
-        currentMug.patterns = newPatterns;
-
-        return {...currentMugs, [design.name]: currentMug};
-      });
-    }
-
-    const wasAddedToMugs = mugs[design.name] && mugs[design.name].patterns.some((patternItem: MUG_PATTERN) => {
-      return patternItem.name === pattern.name;// && patternItem.id === pattern.id;
-    });
-
-    if (wasAddedToMugs) {
-
-      setMugs((currentMugs: { key: MUG }) => {
-        const idx = currentMugs[design.name] && currentMugs[design.name].patterns.findIndex((patternItem: MUG_PATTERN) => {
-          return patternItem.name === pattern.name;// && patternItem.id === pattern.id;
-        });
-        const newPatterns = currentMugs[design.name] ? currentMugs[design.name].patterns : [];
-
-        (idx > -1) && newPatterns.splice(idx, 1);
-        currentMugs[design.name].patterns = newPatterns;
-
-        return {...currentMugs};
-      });
-    } else {
-
-      const newMugPattern = {
-        id: pattern.id, // TODO: async so still not get id yet
-        name: pattern.name,
-        colors: APP_COLORS,
-        sizes: APP_SIZES.slice(0, 4),
-        data: getDefaultMockupInfos(design.name),
-      } as MUG_PATTERN;
-
-      const newMug = {
-        designId: design.id,
-        designName: design.name,
-        patterns: []
-      } as MUG;
-
-      setMugs((currentMugs: { key: MUG }) => {
 
         let currentMug = currentMugs[design.name] || newMug;
         const newPatterns = [...currentMug.patterns, newMugPattern];
@@ -718,12 +684,19 @@ const StepAddProperties = (props: any) => {
     }
   };
 
+  function isPatternChoosen (designName: string, patternName: string) : boolean {
+    return currentMugs[designName] && currentMugs[designName].patterns.some((patternItem: MUG_PATTERN) => {
+      return patternItem.name === patternName;
+    });
+  }
+
   return (
     <div className={classes.root}>
       {
         // NOTE: 1 Design will creates 1 Mug + relevant data (patterns + colors)
         Object.keys(currentDesigns).map((key: string, mugDesignIndex: number) => {
           const design: DESIGN = currentDesigns[key];
+
           return (
             <ExpansionPanel key={'designItem-' + mugDesignIndex}>
               <ExpansionPanelSummary
@@ -752,38 +725,27 @@ const StepAddProperties = (props: any) => {
                         <CardMedia
                           className={classes.designImg}
                           image={pattern.src.toString()}
-                          onClick={() => { addPatternToMug(design, pattern) }}
+                          onClick={(e) => { addPatternToMug(e, design, pattern) }}
                         />
-                        <CheckIcon className={clsx(classes.checkedIcon, { [classes.checked]: currentMugs[design.name] && currentMugs[design.name].patterns.includes(pattern.name) })} />
+                        <CheckIcon className={clsx(classes.checkedIcon, { [classes.checked]: isPatternChoosen(design.name, pattern.name) })} />
                       </CardActionArea>
                     </Card>
                   )
                 } )}
               </ExpansionPanelSummary>
               <ExpansionPanelDetails>
+                <Grid container>
                 {
-                  currentMugs && currentMugs[design.name] && currentMugs[design.name].patterns.map((mugPattern: MUG_PATTERN, mugPatternIndex: number) => (
-                    <Grid container key={'mugPatternImage-'+ mugDesignIndex + '-' + mugPatternIndex}>
-                      <Grid item xs={12} sm={3} lg={2}>
-                        <Card className={classes.card}>
-                          <CardActionArea>
-                            <CardMedia
-                              className={classes.designImg}
-                              // image={mugPattern.imagePreviewUrl}
-                              title={mugPattern.name}
-                            />
-                          </CardActionArea>
-                        </Card>
-                      </Grid>
-                      <Grid item xs={12} sm={9} lg={10}>
-                        <FormFields
-                          designName={design.name} mugPattern={mugPattern}
-                          currentMugs={currentMugs} setCurrentMugs={setCurrentMugs}
-                        />
-                      </Grid>
+                  currentMugs && currentMugs[design.name] && currentMugs[design.name].patterns && currentMugs[design.name].patterns.map((mugPattern: MUG_PATTERN, mugPatternIndex: number) => (
+                    <Grid item xs={12} sm={6} lg={6} key={'mugPatternImage-'+ mugDesignIndex + '-' + mugPatternIndex}>
+                      <FormFields
+                        designName={design.name} mugPattern={mugPattern} patterns={patterns}
+                        currentMugs={currentMugs} setCurrentMugs={setCurrentMugs}
+                      />
                     </Grid>
                   ))
                 }
+                </Grid>
               </ExpansionPanelDetails>
             </ExpansionPanel>
           )

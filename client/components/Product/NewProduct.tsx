@@ -155,18 +155,24 @@ const NewProductPage = () => {
 
   function generateMockupsFromMugs () {
 
-    setCompleted(oldCompleted => {
-      if (oldCompleted === 100) {
-        oldCompleted = 0;
-      }
+    function getRandomInt(max: number) {
+      return Math.floor(Math.random() * Math.floor(max));
+    }
 
-      const diff = Math.random() * 10;
-      oldCompleted += diff;
+    const timer = setInterval(() => {
+      setCompleted(oldCompleted => {
+        if (oldCompleted === 100) {
+          clearInterval(timer);
+          return oldCompleted;
+        }
 
-      return Math.min(oldCompleted + diff, 90);
-    });
+        oldCompleted += getRandomInt(4) * 10;
+        oldCompleted = Math.min(oldCompleted, 95);
 
-    const timer = setInterval(setCompleted, 1000);
+        return oldCompleted;
+      });
+    }, 300);
+
 
     let REQUEST_TIME = 3000;
     let genMockupPromises = [];
@@ -184,8 +190,7 @@ const NewProductPage = () => {
           newMug.addedAt = Date.now();
           newMug.name = 'mug-' + designName.replace('.png', '-') + newMug.addedAt;
 
-          mugs[newMug.name] = newMug;
-          setMugs(mugs);
+          setMugs({...mugs, [newMug.name]: newMug});
 
           newMug.patterns.map((mugPattern: MUG_PATTERN) => {
 
@@ -239,11 +244,11 @@ const NewProductPage = () => {
       });
 
       setMockups(newMockups);
+      setCompleted(100);
 
       setTimeout(() => {
-        clearInterval(timer);
-        setCompleted(100);
         utils.link({ path: '/dashboard' });
+        clearInterval(timer);
       }, 3000);
     });
   }
@@ -397,7 +402,7 @@ const NewProductPage = () => {
                 color="primary"
                 onClick={handleNext}
                 className={classes.button}
-                disabled={(activeStep === steps.length - 1) && (Object.keys(currentMugs).length > 0)}
+                disabled={(activeStep === steps.length - 1) && (Object.keys(currentMugs).length === 0)}
               >
                 {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
               </Button>

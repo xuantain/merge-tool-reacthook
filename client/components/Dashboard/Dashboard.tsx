@@ -303,7 +303,7 @@ const Dashboard = () => {
               return !!mockup.sharedLink;
             });
 
-            rowdata.push(createData(design, mugPattern, mockup, isUploadedError));
+            mockup && rowdata.push(createData(design, mugPattern, mockup, isUploadedError));
           }
         });
       }
@@ -446,35 +446,38 @@ const Dashboard = () => {
           return mockup.patternName === mugPattern.name && mockup.color.name === color.name;
         });
 
-        if (mockup && !mockup.sharedLink && mockup.b64) {
-          alert('ERROR: There are some Mockups were not uploaded yet, hence cannot getting mockups sharedLink to export to Excel file.');
-          return;
-        }
+        if (mockup) {
 
-        // const sharedLink = mockup ? (mockup.sharedLink || mockup.b64 || 'async problem') : 'sharedLink';
-        const sharedLink = mockup.sharedLink || mockup.b64;
+          if (!mockup.sharedLink && mockup.b64) {
+            alert('ERROR: There are some Mockups were not uploaded yet, hence cannot getting mockups sharedLink to export to Excel file.');
+            return;
+          }
 
-        mugPattern.sizes.map((size: SIZE, sidx: number) => {
+          // const sharedLink = mockup ? (mockup.sharedLink || mockup.b64 || 'async problem') : 'sharedLink';
+          const sharedLink = mockup.sharedLink || mockup.b64;
 
-          count++;
+          mugPattern.sizes.map((size: SIZE, sidx: number) => {
 
-          let rowChild = Object.assign({}, mugPattern.data);
+            count++;
 
-          rowChild.parent_sku = rowParent.item_sku;
-          rowChild.item_sku = rowParent.item_sku + '-' + count;
-          rowChild.parent_child = 'child';
-          rowChild.color_name = color.name;
-          rowChild.color_map = color.amzColor;
-          rowChild.size_name = size.appSize;
-          rowChild.size_map = size.amzSize;
-          rowChild.main_image_url = sharedLink.toString();
+            let rowChild = Object.assign({}, mugPattern.data);
 
-          const childRowData = keys.map(key => {
-            return rowChild[key];
+            rowChild.parent_sku = rowParent.item_sku;
+            rowChild.item_sku = rowParent.item_sku + '-' + count;
+            rowChild.parent_child = 'child';
+            rowChild.color_name = color.name;
+            rowChild.color_map = color.amzColor;
+            rowChild.size_name = size.appSize;
+            rowChild.size_map = size.amzSize;
+            rowChild.main_image_url = sharedLink.toString();
+
+            const childRowData = keys.map(key => {
+              return rowChild[key];
+            });
+
+            exportedData.push(childRowData);
           });
-
-          exportedData.push(childRowData);
-        });
+        }
       });
     });
 
@@ -485,6 +488,9 @@ const Dashboard = () => {
 
     const exportFileName = 'amz-shirts-' + Date.now() + '.xlsx';
     XLSX.writeFile(new_workbook, exportFileName, { type:'base64', bookType: 'xlsx' });
+
+    setRows(loadData());
+    setSelectedMugPatterns([]);
   }
 
   const isSelected = (row: RowData) => selectedMugPatterns.findIndex(mugPattern => { return mugPattern.data.item_sku === row.sku}) !== -1;
