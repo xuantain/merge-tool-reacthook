@@ -1,28 +1,10 @@
-const withTypescript = require('@zeit/next-typescript');
+const dotenv = require('dotenv');
 const withImages = require('next-images');
-const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-const path = require('path');
 
-const dev = process.env.NODE_ENV !== 'production';
-let config = {};
+dotenv.config();
 
-if (dev) {
-  config = withImages(
-    withTypescript({
-      webpack(config, options) {
-        // Do not run type checking twice:
-        if (options.isServer) {
-          config.plugins.push(
-            new ForkTsCheckerWebpackPlugin({
-              tsconfig: path.resolve(__dirname, 'tsconfig.json')
-            })
-          );
-        }
+const { DROPBOX_TOKEN, DROPBOX_APP_KEY } = process.env;
 
-        return config;
-      }
-    })
-  );
-}
-
-module.exports = config;
+module.exports = withImages({
+  env: { DROPBOX_TOKEN, DROPBOX_APP_KEY }
+});

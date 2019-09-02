@@ -1,18 +1,21 @@
-# sales-manager
-
-## Installation
-Please follow these steps:
-
-Step 1: `$ git clone https://github.com/xuantain/sales-manager.git`
-
-Step 2: `$ cd sales-manager`
-
-Step 3: `$ npm install`
-
+# Sale Manager
 
 ## Usage
-Please run command below to run the app in dev mode:
 
-`$ npm run dev`
+### Install dependencies
+```
+npm install
+```
 
-and then access `http://localhost:3000`
+### For development
+```
+npm run dev
+```
+
+### For production
+```
+npm run build
+npm start
+```
+
+Open [http://localhost:3000](http://localhost:3000) to view it in the browser.

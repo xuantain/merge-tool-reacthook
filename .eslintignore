@@ -1,6 +1,5 @@
-dist
 .next
 node_modules
-next.config.js
 
-models/*
+backend/types/schema.type.ts
+frontend/types/graphql.type.ts

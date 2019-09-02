@@ -1,0 +1,17 @@
+---
+overwrite: true
+schema:
+  "./backend/schema/**/*.ts":
+    noRequire: true
+generates:
+  backend/types/schema.type.ts:
+    config:
+      contextType: "./context.type#Context"
+      useIndexSignature: true
+    plugins:
+    - typescript
+    - typescript-resolvers
+  frontend/types/graphql.type.ts:
+    plugins:
+    - typescript
+    - typescript-operations
