@@ -15,8 +15,8 @@ module.exports = {
   entities: [__dirname + 'backend/schema/**/*.entity.ts'],
   synchronize: NODE_ENV === 'production' ? false : true,
   logging: false,
-  migrations: ['backend/database/migration'],
-  subscribers: ['backend/database/subscriber'],
+  migrations: [__dirname + 'backend/database/migration'],
+  subscribers: [__dirname + 'backend/database/subscriber'],
   cli: {
     migrationsDir: 'backend/database/migration',
     subscribersDir: 'backend/database/subscriber'
