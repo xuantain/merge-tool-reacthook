@@ -10,6 +10,7 @@
     "dev": "concurrently next nodemon",
     "build": "next build",
     "start": "next start",
+    "typeorm": "typeorm",
     "codegen": "graphql-codegen",
     "eslint": "eslint --ext .js,.jsx,.ts,.tsx .",
     "stylelint": "stylelint 'frontend/**/*.{css,scss}'"

@@ -1,23 +1,12 @@
-import 'reflect-metadata';
 import _ from 'lodash';
-import * as env from './env.util';
+import 'reflect-metadata';
+import * as ormconfig from '~/ormconfig.js';
 import * as validator from 'class-validator';
-import { createConnection, getConnection, ConnectionOptions } from 'typeorm';
-
-const options: ConnectionOptions = {
-  name: 'default',
-  type: 'mysql',
-  host: env.get('DB_HOST'),
-  port: parseInt(env.get('DB_PORT')),
-  username: env.get('DB_USERNAME'),
-  password: env.get('DB_PASSWORD'),
-  database: env.get('DB_DATABASE'),
-  entities: [],
-  synchronize: true,
-  logging: false
-};
+import { createConnection, getConnection } from 'typeorm';
 
 export async function connect(entities: any[]) {
+  const options: any = ormconfig;
+
   try {
     const connection = await getConnection(options.name);
     await connection.close();
