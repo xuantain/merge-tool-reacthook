@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryColumn, Generated } from 'typeorm';
+import { Length, IsEmail } from 'class-validator';
 import { User } from '~/backend/types/schema.type';
 
 @Entity('user')
@@ -8,8 +9,10 @@ export class UserEntity implements User {
   id: string;
 
   @Column({ unique: true })
-  username: string;
+  @IsEmail()
+  email: string;
 
   @Column()
+  @Length(6)
   password: string;
 }

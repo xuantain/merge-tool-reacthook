@@ -87,7 +87,7 @@ export type QueryUserArgs = {
 export type User = {
   __typename?: 'User',
   id: Scalars['ID'],
-  username?: Maybe<Scalars['String']>,
+  email?: Maybe<Scalars['String']>,
   posts?: Maybe<Array<Maybe<Post>>>,
 };
 
@@ -98,7 +98,7 @@ export type UserPostsArgs = {
 };
 
 export type UserInput = {
-  username: Scalars['String'],
+  email: Scalars['String'],
   password: Scalars['String'],
 };
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -224,7 +224,7 @@ export type QueryResolvers<ContextType = Context, ParentType extends ResolversPa
 
 export type UserResolvers<ContextType = Context, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
-  username?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  email?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   posts?: Resolver<Maybe<Array<Maybe<ResolversTypes['Post']>>>, ParentType, ContextType, UserPostsArgs>,
 }>;
 

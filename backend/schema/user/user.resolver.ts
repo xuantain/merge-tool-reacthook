@@ -16,13 +16,16 @@ export const resolvers: Resolvers = {
       const { getUserRepo, newUser } = context.dataSources.database;
       const password = bcrypt.hashSync(args.input.password, bcrypt.genSaltSync(8));
       const user = Object.assign(newUser(), args.input, { password });
+
+      await utils.db.validate(user);
+
       const { id } = await getUserRepo().save(user);
 
       return utils.auth.createToken(id);
     },
     signInToGetToken: async (parent, args, context) => {
       const { getUserRepo } = context.dataSources.database;
-      const user = await getUserRepo().findOne({ username: args.input.username });
+      const user = await getUserRepo().findOne({ email: args.input.email });
       const valid = bcrypt.compareSync(args.input.password, user.password);
       const token = utils.auth.createToken(user.id);
 

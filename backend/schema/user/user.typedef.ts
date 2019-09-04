@@ -3,12 +3,12 @@ import { gql } from 'apollo-server-micro';
 export const typeDef = gql`
   type User {
     id: ID!
-    username: String
+    email: String
     posts(take: Int, skip: Int): [Post]
   }
 
   input UserInput {
-    username: String!
+    email: String!
     password: String!
   }
 
