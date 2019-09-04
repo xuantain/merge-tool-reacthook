@@ -1,3 +1,4 @@
+import { utils } from '~/backend/utils';
 import { Resolvers } from '~/backend/types/schema.type';
 
 export const resolvers: Resolvers = {
@@ -6,7 +7,7 @@ export const resolvers: Resolvers = {
       const { getUserRepo } = context.dataSources.database;
       const { authorId }: any = parent;
 
-      return getUserRepo().findOne({ id: authorId });
+      return getUserRepo().findOne({ where: { id: authorId } });
     }
   },
   Mutation: {
@@ -50,14 +51,14 @@ export const resolvers: Resolvers = {
     post: async (parent, args, context) => {
       const { getPostRepo } = context.dataSources.database;
 
-      return getPostRepo().findOne({ id: args.id });
+      return getPostRepo().findOne({ where: { id: args.id } });
     },
 
     posts: async (parent, args, context) => {
+      const { take, skip } = utils.db.paginate(args);
       const { getPostRepo } = context.dataSources.database;
-      const pagination = { take: args.take || 10, skip: args.skip || 0 };
 
-      return getPostRepo().find({ ...pagination });
+      return getPostRepo().find({ take, skip });
     }
   }
 };

@@ -6,9 +6,9 @@ export const resolvers: Resolvers = {
   User: {
     posts: async (parent, args, context) => {
       const { getPostRepo } = context.dataSources.database;
-      const pagination = { take: args.take || 10, skip: args.skip || 0 };
+      const { take, skip } = utils.db.paginate(args);
 
-      return getPostRepo().find({ authorId: parent.id, ...pagination });
+      return getPostRepo().find({ where: { authorId: parent.id }, take, skip });
     }
   },
   Mutation: {
@@ -32,7 +32,7 @@ export const resolvers: Resolvers = {
   Query: {
     user: async (parent, args, context) => {
       const { getUserRepo } = context.dataSources.database;
-      return getUserRepo().findOne({ id: args.id });
+      return getUserRepo().findOne({ where: { id: args.id } });
     }
   }
 };

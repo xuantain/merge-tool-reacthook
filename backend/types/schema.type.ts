@@ -13,10 +13,10 @@ export type Scalars = {
 
 export type Mutation = {
   __typename?: 'Mutation',
+  _empty?: Maybe<Scalars['String']>,
   createPost?: Maybe<Post>,
   updatePost?: Maybe<Post>,
   deletePost?: Maybe<Scalars['Boolean']>,
-  _empty?: Maybe<Scalars['String']>,
   signUpToGetToken?: Maybe<Scalars['String']>,
   signInToGetToken?: Maybe<Scalars['String']>,
 };
@@ -200,10 +200,10 @@ export type ResolversParentTypes = ResolversObject<{
 }>;
 
 export type MutationResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
+  _empty?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   createPost?: Resolver<Maybe<ResolversTypes['Post']>, ParentType, ContextType, MutationCreatePostArgs>,
   updatePost?: Resolver<Maybe<ResolversTypes['Post']>, ParentType, ContextType, RequireFields<MutationUpdatePostArgs, 'id'>>,
   deletePost?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationDeletePostArgs, 'id'>>,
-  _empty?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   signUpToGetToken?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, MutationSignUpToGetTokenArgs>,
   signInToGetToken?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, MutationSignInToGetTokenArgs>,
 }>;

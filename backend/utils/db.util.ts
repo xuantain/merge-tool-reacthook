@@ -29,3 +29,14 @@ export async function connect(entities: any[]) {
     }
   }
 }
+
+export function paginate({ take, skip }: { take?: number; skip?: number }) {
+  if (take > 100) {
+    throw new Error("The 'take' argument must be less than or equal to 100.");
+  }
+
+  return {
+    take: take || 10,
+    skip: skip || 0
+  };
+}
